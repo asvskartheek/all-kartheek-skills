@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "keywords": ["pi-package"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asvskartheek/all-kartheek-skills.git"
+  },
+  "homepage": "https://github.com/asvskartheek/all-kartheek-skills",
+  "bugs": {
+    "url": "https://github.com/asvskartheek/all-kartheek-skills/issues"
+  },
   "pi": {
     "skills": ["./skills"]
   }
