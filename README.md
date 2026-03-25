@@ -4,7 +4,7 @@ A local Pi package built from recurring patterns found in your Claude and Pi ses
 
 ## What I extracted
 
-After a second pass, I split the broader workflows into **22 atomic skills** created from repeated workflows across `~/.claude/**` and `~/.pi/**` session files.
+After a second pass, I split the broader workflows into **23 atomic skills** created from repeated workflows across `~/.claude/**` and `~/.pi/**` session files.
 
 ### Repo / architecture work
 - `repo-inventory`
@@ -26,6 +26,7 @@ After a second pass, I split the broader workflows into **22 atomic skills** cre
 - `pi-multi-agent-demo`
 - `agent-architecture-explainer`
 - `pi-package-bootstrap`
+- `next-session-handoff`
 
 ### Observability / Phoenix
 - `phoenix-tracing-debug`
