@@ -2,6 +2,7 @@
 A public Pi package that now bundles the minimum set of skills you called out from `~/.claude/skills`, `~/.pi/agent/git/.../agent-stuff`, and `~/.pi/agent/git/.../pi-autoresearch`, plus the previously mined custom skills already in this repo.
 ## What is in this repo now
 - **54 packaged skills total**
+- Includes `autoresearch-paper`, a reusable workflow for turning benchmark/autoresearch runs into professional LaTeX papers with measured tables, ablation narrative, appendix ledgers, and PDF rendering.
 - **27 mined custom Pi skills** from this repo
 - **3 packaged Pi extensions** in `extensions/`
 - **7 imported personal Claude skills** from `~/.claude/skills`
@@ -42,7 +43,7 @@ After installing, run `/reload` in Pi or restart the session if the new resource
 | `anachb` | Austrian public transport (VOR AnachB) for all of Austria. Query real-time departures, search stations/stops, plan routes between locations, and check service disruptions. Use when asking about Austrian trains, buses, trams, metro (U-Bahn), or directions involving public transport in Austria. |
 | `apple-mail` | Search, read, and extract attachments from Apple Mail's local storage. Query emails by sender, recipient, subject, body, date, mailbox, and flags. Read raw RFC822 messages and extract file attachments. |
 | `autoresearch-create` | Set up and run an autonomous experiment loop for any optimization target. Gathers what to optimize, then starts the loop immediately. Use when asked to "run autoresearch", "optimize X in a loop", "set up autoresearch for X", or "start experiments". |
-| `autoresearch-paper` | Turn an autoresearch run into a professional LaTeX research paper with experiment narrative, ablation tables, and PDF render steps. Use when the user wants a paper-grade writeup from benchmark artifacts and experiment logs. |
+| `autoresearch-paper` | Turn a completed autoresearch run into a professional LaTeX research paper with a credible breakthrough narrative, ablation tables, experiment appendix, and rendered PDF. Use when the user wants a paper-grade writeup from benchmark artifacts, run ledgers, W&B exports, or optimization logs. |
 | `basic-openai-agent` | Generates a minimal agent built from scratch using only the openai Python library. Includes the while loop, tool definition, system prompt injection, raw output parsing, and tool dispatcher. Use when the user asks to build a basic agent, write an agent from scratch, demonstrate how agents work, or create a minimal tool-calling loop with openai. |
 | `batch-csv-brief` | Read many CSV files in a folder and produce concise per-file briefs with the key facts requested by the user. Use when summarizing interview sheets, tabular intake forms, batch exports, or datasets that need one-summary-per-file. |
 | `benchmark-autoresearch-loop` | Run disciplined benchmark-driven optimization loops against a fixed harness, keeping only changes that improve the target metric. Use when asked to optimize in a loop, kick off experiments, autoresearch a project, or repeatedly test hypotheses against a benchmark spec. |
