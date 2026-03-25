@@ -1,8 +1,9 @@
 # all-kartheek-skills
 A public Pi package that now bundles the minimum set of skills you called out from `~/.claude/skills`, `~/.pi/agent/git/.../agent-stuff`, and `~/.pi/agent/git/.../pi-autoresearch`, plus the previously mined custom skills already in this repo.
 ## What is in this repo now
-- **50 packaged skills total**
-- **23 mined custom Pi skills** from this repo
+- **54 packaged skills total**
+- **27 mined custom Pi skills** from this repo
+- **3 packaged Pi extensions** in `extensions/`
 - **7 imported personal Claude skills** from `~/.claude/skills`
 - **19 mirrored upstream skills** from `mitsuhiko/agent-stuff`
 - **1 mirrored upstream skill** from `davebcn87/pi-autoresearch`
@@ -41,6 +42,7 @@ After installing, run `/reload` in Pi or restart the session if the new resource
 | `anachb` | Austrian public transport (VOR AnachB) for all of Austria. Query real-time departures, search stations/stops, plan routes between locations, and check service disruptions. Use when asking about Austrian trains, buses, trams, metro (U-Bahn), or directions involving public transport in Austria. |
 | `apple-mail` | Search, read, and extract attachments from Apple Mail's local storage. Query emails by sender, recipient, subject, body, date, mailbox, and flags. Read raw RFC822 messages and extract file attachments. |
 | `autoresearch-create` | Set up and run an autonomous experiment loop for any optimization target. Gathers what to optimize, then starts the loop immediately. Use when asked to "run autoresearch", "optimize X in a loop", "set up autoresearch for X", or "start experiments". |
+| `autoresearch-paper` | Turn an autoresearch run into a professional LaTeX research paper with experiment narrative, ablation tables, and PDF render steps. Use when the user wants a paper-grade writeup from benchmark artifacts and experiment logs. |
 | `basic-openai-agent` | Generates a minimal agent built from scratch using only the openai Python library. Includes the while loop, tool definition, system prompt injection, raw output parsing, and tool dispatcher. Use when the user asks to build a basic agent, write an agent from scratch, demonstrate how agents work, or create a minimal tool-calling loop with openai. |
 | `batch-csv-brief` | Read many CSV files in a folder and produce concise per-file briefs with the key facts requested by the user. Use when summarizing interview sheets, tabular intake forms, batch exports, or datasets that need one-summary-per-file. |
 | `benchmark-autoresearch-loop` | Run disciplined benchmark-driven optimization loops against a fixed harness, keeping only changes that improve the target metric. Use when asked to optimize in a loop, kick off experiments, autoresearch a project, or repeatedly test hypotheses against a benchmark spec. |
@@ -52,8 +54,8 @@ After installing, run `/reload` in Pi or restart the session if the new resource
 | `ghidra` | Reverse engineer binaries using Ghidra's headless analyzer. Decompile executables, extract functions, strings, symbols, and analyze call graphs without GUI. |
 | `github` | Interact with GitHub using the `gh` CLI. Use `gh issue`, `gh pr`, `gh run`, and `gh api` for issues, PRs, CI runs, and advanced queries. |
 | `google-workspace` | Access Google Workspace APIs (Drive, Docs, Calendar, Gmail, Sheets, Slides, Chat, People) via local helper scripts without MCP. Handles OAuth login and direct API calls. |
-| `kartheeks-skill-creator` | Creates Claude skills with proper structure and best practices. Use when the user asks to create a new skill, generate a skill, or build a custom Claude capability. |
 | `librarian` | Cache and refresh remote git repositories under ~/.cache/checkouts/<host>/<org>/<repo> so future references can reuse a local copy. Use this skill when the user points you to a remote git repository as reference or you encountered a remote git repo through other means. |
+| `local-session-miner` | Mine local Pi and Claude session transcripts to find recurring workflows, cluster repeatable tasks, and propose non-duplicate skills/extensions for this repo. Use when the user asks what capabilities should be packaged from prior sessions. |
 | `local-tool-calling-demo` | Build a small educational demo of manual tool-calling using a local OpenAI-compatible endpoint or LM Studio, showing the raw system prompt, tool schema, tool-call parse step, tool execution, and final answer loop. Use when teaching how agents fundamentally work. |
 | `mermaid` | Must read guide on creating/editing mermaid charts with valiation tools |
 | `ml-training-repo-audit` | Audit ML or LLM training repositories to extract datasets, model configs, training scripts, hyperparameters, checkpoints, experiment dashboards, and run commands. Use when asked to inspect training code, W&B/MLflow usage, MLX/PyTorch scripts, or summarize model sizes and training setup. |
@@ -66,12 +68,15 @@ After installing, run `/reload` in Pi or restart the session if the new resource
 | `phoenix-ingestion-smoke-test` | Prove that a Phoenix instance is actually ingesting fresh traces by triggering a minimal trace, following it through the transport path, and confirming it appears in the UI/logs/storage. Use when “Phoenix is running” but you need evidence that traces are flowing. |
 | `phoenix-tracing-debug` | Add, validate, or debug Arize Phoenix and OpenTelemetry tracing for agent apps, web apps, or local demos. Use when traces are missing, collector endpoints are wrong, Phoenix returns errors, or you need verified observability instead of assumed tracing. |
 | `pi-multi-agent-demo` | Scaffold a small multi-agent demo using Pi packages such as `@mariozechner/pi-agent-core` and `@mariozechner/pi-web-ui`, optionally with Phoenix tracing. Use when building a concierge/router agent with specialist sub-agents and a simple UI. |
+| `pi-minimal-session` | Start or configure a clean-room Pi session with no extensions, skills, prompt templates, themes, or saved session state. Use when the user wants the most minimal Pi possible for debugging, isolation, or reproduction. |
 | `pi-package-bootstrap` | Install and verify Pi packages, skills, extensions, prompts, or themes from local paths, git repositories, or npm. Use when asked to set up Pi tooling from a repo, install shared skills globally, or wire custom resources into Pi. |
+| `pi-project-cleanup` | Clean up noisy project-local Pi state such as .pi/settings.json, temporary boards, stale todos, handoffs, and local extensions when they are cluttering a repo. Use when the user asks to clean Pi context or reset repo-local Pi behavior. |
 | `pi-share` | Load and parse session transcripts from shittycodingagent.ai/buildwithpi.ai/buildwithpi.com/pi.dev (pi-share) URLs. Fetches gists, decodes embedded session data, and extracts conversation history. |
 | `plan-driven-build` | Read a `plan.md` or equivalent implementation plan, turn it into execution checkpoints, and build from the plan without losing traceability. Use when a project already has a plan file and the task is to implement it systematically. |
 | `push-ft-model-to-hf-gguf` | Merges a PEFT/LoRA fine-tuned model into its base, converts to GGUF, and pushes to HuggingFace. Use when the user says "push to huggingface", "convert to GGUF", "merge lora", "export model", or after finishing a fine-tuning run and wanting to ship the model for local inference. |
 | `repo-deep-dive` | Systematically explore a local code repository and produce a clear summary of what it does, its folder layout, stack, key modules, entrypoints, configs, and run paths. Use when asked to understand a repo, audit architecture, inventory structure, or answer “what is this project?”. |
 | `repo-inventory` | Produce a clean inventory of a local repository: top-level tree, key docs, config files, likely entrypoints, and notable generated/vendor folders. Use when asked to list files, map a repo quickly, or create a lightweight project inventory before deeper analysis. |
+| `repo-publish-readiness` | Make a repository public-ready and shareable with a strong README, install/run instructions, screenshots, packaging notes, and release hygiene. Use when the user wants to push a repo publicly or make it professional-grade for others. |
 | `researching-open-ended-problems` | Conducts thorough research on open-ended technical problems before implementation. Use when the user says "research this", "investigate how to", "write a research document", "explore options for", or asks you to study a topic before building it. Gathers sources, clarifies the problem, and produces a structured research.md document. |
 | `sentry` | Fetch and analyze Sentry issues, events, transactions, and logs. Helps agents debug errors, find root causes, and understand what happened at specific times. |
 | `served-dashboard-upgrade` | Replace a plain static admin/dashboard page with a served dynamic page that is rendered or hydrated by an actual app/server route. Use when a dashboard should be data-driven, live, or integrated with backend state instead of being just a static file. |
@@ -86,7 +91,13 @@ After installing, run `/reload` in Pi or restart the session if the new resource
 | `wandb-run-review` | Review Weights & Biases usage in a project, identify entity/project names, compare runs, and judge which run performed best based on the requested metric. Use when asked to inspect W&B runs, summarize training dashboards, or compare experiments. |
 | `web-browser` | Allows to interact with web pages by performing actions such as clicking buttons, filling out forms, and navigating links. It works by remote controlling Google Chrome or Chromium browsers using the Chrome DevTools Protocol (CDP). When Claude needs to browse the web, it can use this skill to do so. |
 
+## Extensions catalog
+| Extension | What it does |
+|---|---|
+| `feedback-ticket-board` | Scans repo feedback artifacts such as `user_requests.md`, `.pi/todos/`, `.pi/handoffs/`, and `.pi/feedback-ops/`, writes a lightweight ticket board under `.pi/feedback-ops/`, and now supports build/list/close actions so the widget can also be hidden cleanly. |
+| `litellm-incident-audit` | Audits nearby repositories for LiteLLM incident exposure, flags direct references to the compromised version, and writes a local remediation report. |
+| `skill-or-extension-creator` | Chooses whether a requested capability should be a skill or an extension and can scaffold the starter files. |
+
 ## Notes
-- `package.json` exposes `./skills` as the Pi package resource root.
-- This repo currently focuses on packaging skills directly; extension sources from your environment are documented in `SOURCES.md`.
+- `package.json` exposes both `./skills` and `./extensions` as Pi package resource roots.
 - See `SESSION_MINING_REPORT.md` for the original mining background.

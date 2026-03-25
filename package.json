@@ -12,6 +12,7 @@
     "url": "https://github.com/asvskartheek/all-kartheek-skills/issues"
   },
   "pi": {
+    "extensions": ["./extensions"],
     "skills": ["./skills"]
   }
 }
