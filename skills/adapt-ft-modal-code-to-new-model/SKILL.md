@@ -1,6 +1,6 @@
 ---
 name: adapt-ft-modal-code-to-new-model
-description: Adapts an existing Modal fine-tuning script (train_modal.py) to a new HuggingFace model. Use when the user says "adapt train_modal.py to", "switch the model to", "fine-tune a different model on Modal", or "port the training script to a new model". Follows a strict 4-phase workflow: research → tokenizer inspection with human confirmation → dependency verification via uv pip compile → code edits. Never edits code before human confirms tokenizer/chat-template output.
+description: "Adapts an existing Modal fine-tuning script (train_modal.py) to a new HuggingFace model. Use when the user says 'adapt train_modal.py to', 'switch the model to', 'fine-tune a different model on Modal', or 'port the training script to a new model'. Follows a strict 4-phase workflow: research → tokenizer inspection with human confirmation → dependency verification via uv pip compile → code edits. Never edits code before human confirms tokenizer/chat-template output."
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, Agent
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: repo-inventory
-description: Produce a clean inventory of a local repository: top-level tree, key docs, config files, likely entrypoints, and notable generated/vendor folders. Use when asked to list files, map a repo quickly, or create a lightweight project inventory before deeper analysis.
+description: "Produce a clean inventory of a local repository: top-level tree, key docs, config files, likely entrypoints, and notable generated/vendor folders. Use when asked to list files, map a repo quickly, or create a lightweight project inventory before deeper analysis."
 ---
 
 # Repo Inventory
