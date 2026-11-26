@@ -1,7 +1,7 @@
 # all-kartheek-skills
 A public Pi package that now bundles the minimum set of skills you called out from `~/.claude/skills`, `~/.pi/agent/git/.../agent-stuff`, and `~/.pi/agent/git/.../pi-autoresearch`, plus the previously mined custom skills already in this repo.
 ## What is in this repo now
-- **54 packaged skills total**
+- **55 packaged skills total**
 - Includes `autoresearch-paper`, a reusable workflow for turning benchmark/autoresearch runs into professional LaTeX papers with measured tables, ablation narrative, appendix ledgers, and PDF rendering.
 - **27 mined custom Pi skills** from this repo
 - **3 packaged Pi extensions** in `extensions/`
@@ -88,6 +88,7 @@ After installing, run `/reload` in Pi or restart the session if the new resource
 | `training-config-extract` | Extract model-size definitions, hyperparameters, datasets, schedules, and checkpoint/logging cadence from training code and config files. Use when you need a precise table of training settings without doing a full repo audit. |
 | `update-changelog` | Read this skill before updating changelogs |
 | `uv` | Use `uv` instead of pip/python/venv. Run scripts with `uv run script.py`, add deps with `uv add`, use inline script metadata for standalone scripts. |
+| `visual-sketchbook` | Turn a book, paper, blog post or long document into a 15-22 page visual booklet: one idea and one original diagram per page, light/dark toggle, optional PDF/HTML/PPTX/EPUB/PNG exports. Field-guide style by default, hand-drawn sketchnotes as an option. |
 | `wandb-compare-runs` | Compares W&B experiment runs by fetching full eval/loss training history and finding the minimum eval/loss each run achieved (not just the final value). Reveals overfitting when a large gap exists between min and final eval/loss. Use when the user says "compare runs", "compare experiments", "which run was better", or asks about W&B experiment results. |
 | `wandb-run-review` | Review Weights & Biases usage in a project, identify entity/project names, compare runs, and judge which run performed best based on the requested metric. Use when asked to inspect W&B runs, summarize training dashboards, or compare experiments. |
 | `web-browser` | Allows to interact with web pages by performing actions such as clicking buttons, filling out forms, and navigating links. It works by remote controlling Google Chrome or Chromium browsers using the Chrome DevTools Protocol (CDP). When Claude needs to browse the web, it can use this skill to do so. |
