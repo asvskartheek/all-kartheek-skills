@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Looped Transformers, Explained</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,400;6..144,500;6..144,700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm research-lab explainer
+   IDEA: a field guide, one mechanism per page
+   PICTURE: crisp geometric diagrams and real numbers from both releases
+   COLOUR and TYPE: white canvas, blue/red/green/yellow primaries; Google Sans Flex
+   LAYOUT: picture left, text right; one column under 820px */
+:root{--paper:#ffffff;--card:#ffffff;--ink:#1f1f1f;--muted:#5f6368;--line:#e3e5e8;--soft:#f6f8fb;--blue:#1a73e8;--red:#d93025;--green:#188038;--yel:#f9ab00;--note:#fef7e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme='light']){--paper:#111316;--card:#181b1f;--ink:#e8eaed;--muted:#9aa0a6;--line:#2c3036;--soft:#1c2025;--blue:#8ab4f8;--red:#f28b82;--green:#81c995;--yel:#fdd663;--note:#2d2a1c}}
+:root[data-theme='dark']{--paper:#111316;--card:#181b1f;--ink:#e8eaed;--muted:#9aa0a6;--line:#2c3036;--soft:#1c2025;--blue:#8ab4f8;--red:#f28b82;--green:#81c995;--yel:#fdd663;--note:#2d2a1c}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.55 'Google Sans Flex','Inter',system-ui,sans-serif;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;height:100dvh;overflow:hidden}
+svg text{font-family:'Google Sans Flex','Inter',system-ui,sans-serif;fill:var(--ink)}
+.bar{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--line)}
+.logo{display:flex;gap:4px}.logo i{width:9px;height:9px;border-radius:50%}
+.bar .t{min-width:0;flex:1 1 0;font-weight:500;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.count{font-size:14px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.btn{font:500 15px 'Google Sans Flex','Inter',sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0 18px;min-height:44px;min-width:44px;cursor:pointer}
+.btn.icon{display:inline-grid;place-items:center;padding:0;width:44px}.btn.icon svg{width:20px;height:20px}
+.btn:hover{background:var(--soft)}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn:focus-visible,.thumb:focus-visible,.dot:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.btn[disabled]{opacity:.35;cursor:default}
+.stage{overflow:auto;overscroll-behavior:contain}
+.page{max-width:1240px;margin:0 auto;padding:32px 28px 40px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:56px;align-items:center;min-height:100%}
+.page[hidden]{display:none}
+.fig{background:var(--soft);border-radius:28px;padding:18px}
+.fig svg{display:block;width:100%;height:auto}
+.kick{font-size:14px;font-weight:500;color:var(--blue);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.kick::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor}
+h1,h2{font-weight:500;line-height:1.1;margin:0 0 16px;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(36px,5vw,56px)}h2{font-size:clamp(26px,3vw,36px)}
+.idea{font-size:19px;margin:0 0 18px;color:var(--ink)}
+mark{background:transparent;color:inherit;font-weight:700;box-shadow:inset 0 -.38em 0 color-mix(in srgb,var(--yel) 38%,transparent)}
+.pts{list-style:none;padding:0;margin:0 0 20px}
+.pts li{position:relative;padding-left:22px;margin:7px 0;color:var(--ink)}
+.pts li::before{content:'';position:absolute;left:2px;top:.62em;width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.pts li:nth-child(2)::before{background:var(--red)}.pts li:nth-child(3)::before{background:var(--green)}.pts li:nth-child(4)::before{background:var(--yel)}
+.pts b{font-weight:700}
+.hook{display:inline-flex;gap:10px;align-items:center;background:var(--note);border-radius:16px;padding:10px 16px;font-weight:500;margin:0 0 16px;max-width:100%}
+.hook::before{content:'';flex:none;width:10px;height:10px;border-radius:50%;background:var(--yel)}
+.ask{border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin:0}
+.ask b{color:var(--red);font-weight:500}
+.src{font-size:13px;color:var(--muted);margin:12px 0 0}
+.credit{color:var(--muted);margin:0 0 22px;max-width:52ch}
+.cmp{width:100%;border-collapse:collapse;font-size:15px;margin:0 0 16px}
+.cmp th,.cmp td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmp thead th{font-weight:500;color:var(--muted);font-size:13px}
+.cmp th[scope=row]{font-weight:500;color:var(--muted);width:30%}
+.traps{display:grid;gap:10px;margin:0 0 16px;padding:0;list-style:none}
+.traps li{border:1px solid var(--line);border-radius:16px;padding:10px 14px}
+.traps b{color:var(--red);font-weight:500}.traps .way{color:var(--green)}
+.recap{grid-template-columns:minmax(0,1fr);align-items:start}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.thumb{font:14px/1.35 'Google Sans Flex','Inter',sans-serif;color:var(--ink);text-align:left;background:var(--soft);border:0;border-radius:18px;padding:10px;cursor:pointer}
+.thumb:hover{outline:1px solid var(--line)}
+.thumb svg{width:100%;height:auto;display:block;background:var(--card);border-radius:12px}
+.thumb span{display:block;margin-top:6px}
+.foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:8px 20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.foot .cr{flex:1 1 360px}.foot a{color:var(--blue)}
+.dots{display:flex;flex-wrap:wrap}
+.dot{width:20px;height:24px;border:0;background:none;padding:0;cursor:pointer;display:grid;place-items:center}
+.dot i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.dot[aria-current] i{background:var(--blue);width:9px;height:9px}
+@media(max-width:820px){.page{grid-template-columns:minmax(0,1fr);gap:24px;padding:20px 16px 30px;align-items:start}.dots{display:none}.foot{font-size:12px;padding:6px 16px}.idea{font-size:18px}}
+@media(max-width:600px){.cmp{font-size:13px}.cmp th,.cmp td{padding:6px 4px}}
+@media(max-width:480px){.count,.logo{display:none}.bar{padding:8px 12px}}
+@media(prefers-reduced-motion:no-preference){.page:not([hidden]) .fig{animation:in .35s ease-out}@keyframes in{from{opacity:0;transform:translateY(6px)}}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <span class="logo" aria-hidden="true"><i style="background:var(--blue)"></i><i style="background:var(--red)"></i><i style="background:var(--yel)"></i><i style="background:var(--green)"></i></span>
+  <div class="t">Looped transformers, explained</div>
+  <span class="count" id="count"></span>
+  <button class="btn icon" id="theme" aria-label="Switch to dark mode"></button>
+  <button class="btn" id="prev" aria-label="Previous page">&larr;</button>
+  <button class="btn" id="next" aria-label="Next page">&rarr;</button>
+</header>
+<main class="stage" id="stage"></main>
+<footer class="foot">
+  <span class="cr">Unofficial visual companion to <a href="https://z.ai/blog/glm-5.4">Z.ai’s GLM-5.4 post</a> and Thinking Machines Lab’s <a href="https://thinkingmachines.ai/news/inkling-2-mini/">Inkling 2 Mini post</a> and <a href="https://thinkingmachines.ai/model-card/inkling-2-mini/">model card</a> (Nov 2026). Read them for the full story.</span>
+  <nav class="dots" id="dots" aria-label="Pages"></nav>
+</footer>
+<script>
+{
+var NS='http://www.w3.org/2000/svg';
+var CV={ink:'--ink',b:'--blue',r:'--red',g:'--green',y:'--yel',m:'--muted',l:'--line',card:'--card',soft:'--soft'};
+var uid=0;
+function kit(svg){
+  var id='k'+(++uid),defs=document.createElementNS(NS,'defs');svg.appendChild(defs);
+  Object.keys(CV).forEach(function(k){var m=document.createElementNS(NS,'marker');m.setAttribute('id',id+k);m.setAttribute('viewBox','0 0 10 10');m.setAttribute('refX','8');m.setAttribute('refY','5');m.setAttribute('markerWidth','6');m.setAttribute('markerHeight','6');m.setAttribute('orient','auto-start-reverse');
+    var p=document.createElementNS(NS,'path');p.setAttribute('d','M0,0 L10,5 L0,10 z');p.style.fill='var('+CV[k]+')';m.appendChild(p);defs.appendChild(m)});
+  function el(tag,at,o){o=o||{};var e=document.createElementNS(NS,tag);for(var k in at)e.setAttribute(k,at[k]);
+    e.style.stroke=o.c==='none'?'none':'var('+CV[o.c||'ink']+')';e.style.strokeWidth=o.w||2;e.style.strokeLinecap='round';e.style.strokeLinejoin='round';
+    if(o.f){e.style.fill='var('+CV[o.f]+')';e.style.fillOpacity=o.fo==null?.16:o.fo}else e.style.fill='none';
+    if(o.dash)e.style.strokeDasharray=o.dash===true?'6 6':o.dash;if(o.op!=null)e.style.opacity=o.op;
+    if(o.arrow){e.setAttribute('marker-end','url(#'+id+(o.c||'ink')+')')}
+    svg.appendChild(e);return e}
+  var A={
+    L:function(x1,y1,x2,y2,o){return el('line',{x1:x1,y1:y1,x2:x2,y2:y2},o)},
+    R:function(x,y,w,h,o){o=o||{};var r=o.r==null?10:o.r;return el('rect',{x:x,y:y,width:w,height:h,rx:r},o)},
+    C:function(x,y,r,o){return el('circle',{cx:x,cy:y,r:r},o)},
+    E:function(x,y,w,h,o){return el('ellipse',{cx:x,cy:y,rx:w/2,ry:h/2},o)},
+    P:function(d,o){return el('path',{d:d},o)},
+    AR:function(x1,y1,x2,y2,o){o=o||{};o.arrow=true;return el('line',{x1:x1,y1:y1,x2:x2,y2:y2},o)},
+    AP:function(d,o){o=o||{};o.arrow=true;return el('path',{d:d},o)},
+    T:function(x,y,s,o){o=o||{};var z=o.size||16;
+      if(o.bg){var w=s.length*z*.55+12,bx=o.anchor==='start'?x-6:o.anchor==='end'?x-w+6:x-w/2,b=document.createElementNS(NS,'rect');b.setAttribute('x',bx);b.setAttribute('y',y-z);b.setAttribute('width',w);b.setAttribute('height',z*1.45);b.setAttribute('rx',6);b.style.fill='var(--card)';svg.appendChild(b)}
+      var t=document.createElementNS(NS,'text');t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('font-size',z);t.setAttribute('text-anchor',o.anchor||'middle');t.setAttribute('font-weight',o.bold?700:o.med?500:400);
+      if(o.c)t.style.fill='var('+CV[o.c]+')';if(o.rot)t.setAttribute('transform','rotate('+o.rot+' '+x+' '+y+')');t.textContent=s;svg.appendChild(t);return t}
+  };
+  return A;
+}
+function sketch(fn,vb){var svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox',vb||'0 0 640 420');svg.setAttribute('role','img');fn(kit(svg));return svg}
+
+/* ---------- drawings ---------- */
+var SK={
+cover:function(A){
+  var lab=['prelude','core','core','core','coda'],col=['b','g','g','g','b'];
+  for(var i=0;i<5;i++){A.R(60,64+i*58,130,46,{c:col[i],f:col[i],fo:.14,w:1.5});A.T(125,93+i*58,lab[i],{size:15,c:col[i],med:true})}
+  A.T(125,40,'unrolled',{size:14,c:'m'});A.T(375,40,'stored',{size:14,c:'m'});
+  A.T(250,226,'=',{size:40,c:'m'});
+  A.R(310,90,130,52,{c:'b',f:'b',fo:.14,w:1.5});A.T(375,121,'prelude',{size:15,c:'b',med:true});
+  A.R(310,170,130,90,{c:'g',f:'g',fo:.18,w:2});A.T(375,221,'core',{size:18,c:'g',bold:true});
+  A.R(310,288,130,52,{c:'b',f:'b',fo:.14,w:1.5});A.T(375,319,'coda',{size:15,c:'b',med:true});
+  A.AR(375,142,375,166,{c:'m',w:1.5});A.AR(375,260,375,284,{c:'m',w:1.5});
+  A.AP('M442,248 C520,262 520,166 446,180',{c:'r',w:3});
+  A.T(560,224,'× k',{size:30,c:'r',bold:true,anchor:'start'});
+  [['b',560,80],['r',584,80],['y',560,104],['g',584,104]].forEach(function(d){A.C(d[1],d[2],8,{c:'none',f:d[0],fo:1})});
+},
+knobs:function(A){
+  A.T(165,64,'parameters',{size:18,c:'b',med:true});A.T(470,40,'serial depth',{size:18,c:'g',med:true});
+  for(var r=0;r<3;r++)for(var c=0;c<8;c++)A.C(60+c*30,150+r*32,10,{c:'b',f:'b',fo:.3,w:1.5});
+  A.T(165,270,'more room to store facts',{size:15,c:'m'});
+  for(var r2=0;r2<8;r2++)for(var c2=0;c2<2;c2++)A.C(455+c2*30,80+r2*34,10,{c:'g',f:'g',fo:.3,w:1.5});
+  var d='M470,370';for(var k=7;k>=0;k--)d+=' L'+(k%2?455:485)+','+(80+k*34);d+=' L470,48';
+  A.AP(d,{c:'r',w:2.5});
+  A.T(470,400,'more steps in a row',{size:15,c:'m'});
+  A.L(320,60,320,380,{c:'l',w:1.5});
+},
+unroll:function(A){
+  A.R(40,50,130,44,{c:'b',f:'b',fo:.14,w:1.5});A.T(105,78,'prelude',{size:15,c:'b',med:true});
+  A.R(40,120,130,90,{c:'g',f:'g',fo:.18});A.T(105,170,'core',{size:18,c:'g',bold:true});
+  A.R(40,236,130,44,{c:'b',f:'b',fo:.14,w:1.5});A.T(105,264,'coda',{size:15,c:'b',med:true});
+  A.AP('M172,198 C230,206 230,124 176,132',{c:'r',w:2.5});A.T(232,170,'×3',{size:20,c:'r',bold:true,anchor:'start'});
+  A.AR(280,165,330,165,{c:'m',w:2});A.T(305,150,'unroll',{size:13,c:'m'});
+  var y=30,bl=[['prelude','b',34],['pass 1','g',52],['pass 2','g',52],['pass 3','g',52],['coda','b',34]];
+  bl.forEach(function(b){A.R(350,y,130,b[2],{c:b[1],f:b[1],fo:b[1]==='g'?.18:.14,w:1.5});A.T(415,y+b[2]/2+6,b[0],{size:15,c:b[1],med:true});y+=b[2]+8});
+  A.P('M492,72 h12 v172 h-12',{c:'r',w:1.5});A.T(512,162,'same',{size:14,c:'r',anchor:'start'});A.T(512,180,'weights',{size:14,c:'r',anchor:'start'});
+  A.T(320,345,'depth = prelude + k × core + coda',{size:20,med:true});
+  A.T(320,385,'k = number of passes through the core',{size:14,c:'m'});
+},
+timeline:function(A){
+  A.L(40,210,600,210,{c:'l',w:3});
+  var ev=[[110,'b','2018','Universal Transformer','depth with shared weights',-1],[260,'g','2025','Looped LMs','gains at small scale',1],[440,'r','20 Nov 2026','Inkling 2 Mini','26.4B · 3 passes',-1],[560,'y','23 Nov 2026','GLM-5.4','750B · 2 passes',1]];
+  ev.forEach(function(e){A.C(e[0],210,11,{c:'none',f:e[1],fo:1});A.L(e[0],210+e[5]*14,e[0],210+e[5]*44,{c:'l',w:1.5});
+    var y0=e[5]<0?100:270;A.T(e[0],y0,e[2],{size:14,c:e[1],med:true});A.T(e[0],y0+24,e[3],{size:16,med:true});A.T(e[0],y0+46,e[4],{size:13,c:'m'})});
+},
+middle:function(A){
+  for(var i=0;i<24;i++){var c=i>=6&&i<18?'g':'b';A.R(40,30+i*15,120,11,{c:'none',f:c,fo:c==='g'?.55:.3,r:3})}
+  A.P('M170,30 h8 v86 h-8',{c:'b',w:1.5});A.T(186,78,'translate in',{size:14,c:'b',anchor:'start'});
+  A.P('M170,120 h8 v176 h-8',{c:'g',w:1.5});A.T(186,204,'reason',{size:14,c:'g',anchor:'start',med:true});A.T(186,222,'(looped)',{size:14,c:'g',anchor:'start'});
+  A.P('M170,300 h8 v86 h-8',{c:'b',w:1.5});A.T(186,348,'translate out',{size:14,c:'b',anchor:'start'});
+  function X(v){return 330+(v-1)*270}
+  A.T(465,92,'compute a no-loop model needs',{size:14,c:'m'});A.T(465,110,'to match (×)',{size:14,c:'m'});
+  A.T(330,170,'loop the middle',{size:15,anchor:'start',med:true});A.R(X(1.51),180,X(1.91)-X(1.51),18,{c:'none',f:'g',fo:.9,r:9});A.T(X(1.91)+8,195,'1.51–1.91',{size:13,anchor:'start',c:'g'});
+  A.T(330,250,'loop the last layers',{size:15,anchor:'start',med:true});A.R(X(1.24),260,X(1.36)-X(1.24),18,{c:'none',f:'b',fo:.9,r:9});A.T(X(1.36)+8,275,'1.24–1.36',{size:13,anchor:'start',c:'b'});
+  A.L(X(1),310,X(2),310,{c:'l',w:1.5});[1,1.25,1.5,1.75,2].forEach(function(v){A.L(X(v),306,X(v),314,{c:'m',w:1.2});A.T(X(v),334,v+'×',{size:12,c:'m'})});
+},
+compare:function(A){
+  var s=6.9;
+  function bar(y,segs,name,passes){var x=40;A.T(40,y-58,name,{size:16,anchor:'start',med:true});
+    segs.forEach(function(g,i){var w=g*s,c=i===1?'g':'b';A.R(x,y,w,40,{c:'none',f:c,fo:i===1?.5:.25,r:6});A.T(x+w/2,y+26,''+g,{size:15,med:true});
+      if(i===1){A.AP('M'+(x+w-8)+','+(y-4)+' C'+(x+w-8)+','+(y-34)+' '+(x+8)+','+(y-34)+' '+(x+8)+','+(y-6),{c:'r',w:2});A.T(x+w+14,y-14,'×'+passes,{size:16,c:'r',bold:true,anchor:'start'})}
+      x+=w+2})}
+  bar(120,[26,28,24],'GLM-5.4 · 78 layers → 106 runs',2);
+  bar(300,[6,12,6],'Inkling 2 Mini · 24 layers → 48 runs',3);
+  A.T(40,200,'prelude / core / coda, layer counts drawn to scale',{size:13,c:'m',anchor:'start'});
+},
+blowup:function(A){
+  A.L(230,60,230,330,{c:'m',w:1.5,dash:true});A.T(236,56,'scale later layers expect',{size:13,c:'m',anchor:'start'});
+  A.T(50,106,'x before the loop',{size:14,anchor:'start',c:'m'});A.AR(50,122,200,122,{c:'b',w:4});
+  A.T(50,186,'after pass 1',{size:14,anchor:'start',c:'m'});A.AR(50,202,330,202,{c:'y',w:5});
+  A.T(50,266,'after pass 2',{size:14,anchor:'start',c:'m'});A.AR(50,282,520,282,{c:'r',w:7});
+  A.T(320,380,'overwrite the state each pass and its size keeps growing',{size:15,c:'m'});
+},
+gate:function(A){
+  function row(y,b,lab){A.T(100,y-36,lab,{size:15,anchor:'start',med:true});A.L(100,y,540,y,{c:'l',w:3});
+    var nx=100+b*440;A.AR(100,y,nx-12,y,{c:'g',w:3});A.C(100,y,9,{c:'none',f:'b',fo:1});A.C(540,y,9,{c:'none',f:'r',fo:1});A.C(nx,y,9,{c:'g',w:3,f:'card',fo:1});
+    A.T(100,y+30,'x',{size:16,c:'b',med:true});A.T(540,y+30,'h',{size:16,c:'r',med:true});A.T(nx,y+30,'β = '+b,{size:14,c:'g',med:true})}
+  row(140,.25,'small gate: write a little');row(270,.9,'large gate: write a lot');
+  A.T(320,370,'x ← x + β · (h − x)',{size:22,med:true});
+  A.T(560,100,'h = this pass’s proposal',{size:12,c:'m',anchor:'end'});
+},
+relay:function(A){
+  A.R(60,40,520,44,{c:'b',f:'b',fo:.14,w:1.5});A.T(320,68,'prelude output: re-read by every pass',{size:15,c:'b',med:true});
+  [140,320,500].forEach(function(x,i){A.AR(x,86,x,172,{c:'b',w:1.8});A.C(x,226,50,{c:'g',f:'g',fo:.16,w:2});A.T(x,232,'pass '+(i+1),{size:16,c:'g',med:true})});
+  [[190,270],[370,450]].forEach(function(p){A.AR(p[0],226,p[1]-4,226,{c:'r',w:2.5});A.T((p[0]+p[1])/2,212,'message',{size:13,c:'r'})});
+  [[282,150],[462,150]].forEach(function(g){A.C(g[0]-140+122,g[1],13,{c:'y',f:'y',fo:.35,w:1.5})});
+  A.T(262,155,'β',{size:14,med:true});A.T(442,155,'β',{size:14,med:true});
+  A.AR(500,278,500,326,{c:'m',w:1.8});A.R(420,330,160,40,{c:'b',f:'b',fo:.14,w:1.5});A.T(500,356,'coda → next token',{size:14,c:'b',med:true});
+  A.T(60,350,'gate on the message',{size:13,c:'m',anchor:'start'});A.C(48,345,6,{c:'none',f:'y',fo:.8});
+},
+routes:function(A){
+  A.T(165,40,'retrofit a trained model',{size:16,med:true});A.T(165,60,'GLM-5.4',{size:13,c:'m'});
+  for(var i=0;i<5;i++){var c=i>=1&&i<=3?'g':'b';A.R(100,90+i*50,130,40,{c:'none',f:c,fo:c==='g'?.4:.22,r:6})}
+  A.AP('M234,330 C290,330 290,140 236,140',{c:'r',w:2.5});A.T(296,240,'+ loop',{size:14,c:'r',anchor:'start',med:true});
+  A.T(165,380,'then continued training',{size:13,c:'m'});
+  A.L(330,40,330,380,{c:'l',w:1.5});
+  A.T(490,40,'loop during training',{size:16,med:true});A.T(490,60,'Inkling 2 Mini',{size:13,c:'m'});
+  A.L(380,320,610,320,{c:'m',w:1.5});A.L(380,320,380,110,{c:'m',w:1.5});
+  A.P('M380,318 C440,318 470,312 500,240 C530,170 560,140 608,134',{c:'g',w:3});
+  A.C(380,318,6,{c:'none',f:'r',fo:1});A.T(392,300,'starts closed',{size:13,c:'r',anchor:'start'});
+  A.T(495,345,'training steps',{size:13,c:'m'});A.T(366,215,'message gate',{size:13,c:'m',rot:-90});
+},
+cost:function(A){
+  A.C(220,40,6,{c:'none',f:'b',fo:1});A.T(232,45,'no loop',{size:14,anchor:'start'});A.C(320,40,6,{c:'none',f:'g',fo:1});A.T(332,45,'looped',{size:14,anchor:'start'});
+  var k=1.0,base=340;
+  function bars(x,a,b,lab,note){var ha=a*k,hb=b*k;A.R(x,base-ha,64,ha,{c:'none',f:'b',fo:.75,r:6});A.R(x+76,base-hb,64,hb,{c:'none',f:'g',fo:.8,r:6});
+    A.T(x+32,base-ha-10,a+'%',{size:14,med:true});A.T(x+108,base-hb-10,b+'%',{size:14,med:true});A.T(x+70,base+26,lab,{size:14,c:'m'});A.T(x+70,base+48,note,{size:14,c:'r',med:true})}
+  bars(90,92.5,100,'training compute','looping costs 7.5% more');
+  bars(380,240,100,'inference compute to match','no loop needs 140% more');
+  A.L(60,base,600,base,{c:'l',w:1.5});
+},
+varloop:function(A){
+  var xs=[110,200,290,380,540],ps=['1','2','3','5','10'],vs=[16,26,37,42,40];function Y(v){return 330-v*5.4}
+  A.R(80,60,340,280,{c:'none',f:'g',fo:.07,r:12});A.T(250,82,'trained with 1–5 passes',{size:13,c:'g'});
+  A.T(460,200,'…',{size:22,c:'m'});
+  [0,20,40].forEach(function(v){A.L(70,Y(v),600,Y(v),{c:'l',w:1});A.T(62,Y(v)+4,v+'s',{size:12,c:'m',anchor:'end'})});
+  var d='';xs.forEach(function(x,i){d+=(i?' L':'M')+x+','+Y(vs[i])});A.P(d,{c:'g',w:2.5});
+  xs.forEach(function(x,i){A.C(x,Y(vs[i]),8,{c:'g',w:2.5,f:'card',fo:1});A.T(x,Y(vs[i])-16,vs[i]+'s',{size:14,med:true});A.T(x,365,ps[i],{size:14,c:'m'})});
+  A.C(312,Y(41),7,{c:'none',f:'r',fo:1});A.T(300,Y(37)+44,'Inkling 2 Mini: 41s',{size:12,c:'r'});
+  A.T(320,395,'passes through the core',{size:13,c:'m'});
+  A.T(540,Y(40)+40,'never trained here',{size:12,c:'m'});
+},
+compute:function(A){
+  var u=48,base=340,xs=[110,270,430],lab=['1 pass','2 passes','3 passes'];
+  A.L(60,base,600,base,{c:'l',w:1.5});
+  xs.forEach(function(x,i){A.R(x,base-3.4*u,100,3.4*u,{c:'none',f:'b',fo:.55,r:6});A.T(x+50,base-1.7*u+5,'3.4B',{size:14,med:true});
+    for(var k=0;k<i;k++){var y=base-3.4*u-(k+1)*u-(k+1)*3;A.R(x,y,100,u,{c:'none',f:'g',fo:.6,r:6});A.T(x+50,y+u/2+5,'+1.0B',{size:13,med:true})}
+    var tot=(3.4+i).toFixed(1);A.T(x+50,base-(3.4+i)*u-i*3-12,tot+'B',{size:16,bold:true,c:i===2?'r':'ink'});A.T(x+50,base+24,lab[i],{size:14,c:'m'})});
+  A.T(480,base+46,'shipped',{size:13,c:'r'});
+  A.T(330,40,'active parameters used per token',{size:14,c:'m'});
+},
+kv:function(A){
+  A.T(40,58,'one full cache per pass',{size:15,anchor:'start',med:true});
+  A.R(40,72,520,18,{c:'none',f:'b',fo:.6,r:5});A.R(40,96,520,18,{c:'none',f:'r',fo:.6,r:5});A.T(570,110,'2×',{size:15,c:'r',anchor:'start',bold:true});
+  A.T(40,170,'share pass 1’s cache + small window',{size:15,anchor:'start',med:true});A.T(40,188,'GLM-5.4: 128-token window, reuses top-2,048 picks',{size:12,c:'m',anchor:'start'});
+  A.R(40,200,520,18,{c:'none',f:'b',fo:.6,r:5});A.R(530,224,30,18,{c:'none',f:'r',fo:.7,r:5});A.T(570,238,'+ tiny',{size:14,c:'r',anchor:'start'});
+  A.T(40,296,'mostly local layers',{size:15,anchor:'start',med:true});A.T(40,314,'Inkling 2 Mini: 20 local (1,024 tokens), 4 global',{size:12,c:'m',anchor:'start'});
+  A.R(40,326,520,12,{c:'none',f:'b',fo:.6,r:4});for(var i=0;i<3;i++)A.R(500,344+i*14,60,10,{c:'none',f:'g',fo:.7,r:4});
+  A.T(600,410,'lengths not to scale',{size:11,c:'m',anchor:'end'});
+},
+joule:function(A){
+  var d=[['Inkling 2 Mini',.703,'g'],['Qwen3.6-35B-A3B',.430,'b'],['Gemma-4-26B-A4B',.159,'b'],['Qwen3.5-27B',.036,'b']];
+  A.T(320,50,'intelligence per joule · NVIDIA DGX Spark',{size:14,c:'m'});
+  d.forEach(function(r,i){var y=100+i*70,w=r[1]*520;A.T(190,y+20,r[0],{size:14,anchor:'end',med:i===0});A.R(200,y,Math.max(w*.6,4),28,{c:'none',f:r[2],fo:i?.5:.85,r:6});A.T(208+Math.max(w*.6,4),y+20,r[1].toFixed(3),{size:14,anchor:'start',med:true})});
+  A.T(320,400,'~20 GB checkpoint, trained and run in 4-bit (NVFP4)',{size:13,c:'m'});
+},
+know:function(A){
+  var d=[['AIME25 (math)',11.3],['GPQA-Diamond',8.7],['AA-LCR (long ctx)',7.3],['MMLU-Pro',3.4],['IFBench',3.3]];
+  A.T(330,40,'points gained from the loop · GLM 30B test',{size:14,c:'m'});
+  d.forEach(function(r,i){var y=66+i*48;A.T(200,y+20,r[0],{size:14,anchor:'end'});A.R(210,y,r[1]*30,28,{c:'none',f:i<3?'g':'b',fo:.75,r:6});A.T(218+r[1]*30,y+20,'+'+r[1],{size:14,anchor:'start',med:true})});
+  A.L(40,316,600,316,{c:'l',w:1.5});
+  A.T(200,358,'closed-book facts',{size:14,anchor:'end'});A.C(214,353,7,{c:'r',w:2.5,f:'card',fo:1});A.T(232,358,'≈ flat with more passes (Inkling varloop)',{size:13,anchor:'start',c:'r'});
+},
+nhop:function(A){
+  var ps=['1','2','3','5','10'],h=[2,3,4,5,5],u=50,base=350;
+  A.T(330,36,'longest chain still answered ≥ 50% right',{size:14,c:'m'});
+  ps.forEach(function(p,i){var x=90+i*104;for(var k=0;k<h[i];k++)A.R(x,base-(k+1)*u+4,80,u-6,{c:'none',f:'g',fo:.25+k*.12,r:6});
+    A.T(x+40,base-h[i]*u-6,h[i]+' hops',{size:15,med:true});A.T(x+40,base+24,p+(p==='1'?' pass':' passes'),{size:14,c:'m'})});
+  A.T(330,402,'approximate, read from Thinking Machines’ N-Hop chart',{size:12,c:'m'});
+},
+inside:function(A){
+  A.T(40,40,'reasoning tokens per correct answer (GPQA-D)',{size:14,c:'m',anchor:'start'});
+  [['1 pass',3703],['3 passes',1731],['5 passes',1661]].forEach(function(r,i){var y=58+i*42;A.T(110,y+20,r[0],{size:14,anchor:'end'});A.R(120,y,r[1]*.11,26,{c:'none',f:i?'g':'b',fo:.7,r:6});A.T(128+r[1]*.11,y+19,r[1].toLocaleString('en'),{size:14,anchor:'start',med:true})});
+  A.T(40,226,'“wait / actually / hmm” per answer',{size:14,c:'m',anchor:'start'});
+  [['1 pass',9.7],['3 passes',3.9],['5 passes',3.6]].forEach(function(r,i){var y=244+i*42;A.T(110,y+20,r[0],{size:14,anchor:'end'});A.R(120,y,r[1]*40,26,{c:'none',f:i?'y':'r',fo:.7,r:6});A.T(128+r[1]*40,y+19,''+r[1],{size:14,anchor:'start',med:true})});
+  A.T(600,402,'words per sentence unchanged: 8.9 → 8.7',{size:12,c:'m',anchor:'end'});
+},
+monitor:function(A){
+  var vs=[1.0,2.5,4.0,2.8,5.0];function Y(v){return 330-v*11}
+  A.T(330,36,'attacks that slipped past a weaker monitor',{size:14,c:'m'});
+  [0,10,20].forEach(function(v){A.L(80,Y(v),600,Y(v),{c:'l',w:1});A.T(72,Y(v)+4,v+'%',{size:12,c:'m',anchor:'end'})});
+  A.L(80,Y(20.5),600,Y(20.5),{c:'r',w:1.5,dash:true});A.T(596,Y(20.5)-8,'Qwen3.8-27B as attacker: 20.5%',{size:12,c:'r',anchor:'end'});
+  vs.forEach(function(v,i){var x=140+i*100;A.C(x,Y(v),8,{c:'none',f:'b',fo:.9});A.T(x,Y(v)-14,v.toFixed(1)+'%',{size:13,med:true});A.T(x,358,(i+1)+'',{size:14,c:'m'})});
+  A.T(340,384,'passes through the core (varloop model)',{size:13,c:'m'});
+  A.T(340,406,'monitor sees tool calls only',{size:12,c:'m'});
+},
+overthink:function(A){
+  A.C(260,210,110,{c:'r',w:3});
+  A.AP('M370,206 A110,110 0 0 1 368,226',{c:'r',w:3});
+  A.T(260,200,'re-check',{size:18,c:'r',med:true});A.T(260,226,'re-check…',{size:15,c:'m'});
+  A.AP('M372,210 L590,210',{c:'g',w:2.5,dash:true});A.T(480,196,'stop rule',{size:15,c:'g',med:true});A.T(480,236,'token / turn limits',{size:13,c:'m'});
+}
+};
+
+/* ---------- pages ---------- */
+var PAGES=[
+{id:'cover',type:'cover',sk:'cover'},
+{id:'two-knobs',kick:'1 · The idea',title:'Parameters store knowledge; depth does the reasoning',
+ idea:'A normal transformer gets <mark>a fixed number of steps per token</mark>. Anything that needs more steps has to be written out as visible reasoning.',
+ pts:['<b>Width and experts</b> hold facts and skills.','<b>Depth</b> is how many steps run one after another for each token.','<b>Looping</b> adds depth without adding new weights.'],
+ hook:'Bigger memory and longer thinking are different things.',ask:'Name a task that is mostly recall, and one that is a long chain of steps.',sk:'knobs'},
+{id:'unroll',kick:'2 · The idea',title:'Run the same core layers k times',
+ idea:'Split the stack into a <mark>prelude</mark> (first layers: turn tokens into ideas), a <mark>core</mark> (middle layers: the thinking) and a <mark>coda</mark> (last layers: turn ideas back into the next token). Only the core repeats, using the same weights every pass.',
+ pts:['<b>Inkling 2 Mini</b>: 6 + 3×12 + 6 = 48 layer runs from 24 stored layers.','<b>GLM-5.4</b>: 26 + 2×28 + 24 = 106 runs from 78 stored layers.','<b>Memory</b> holds one copy of the core; compute pays for every pass.'],
+ hook:'Same weights, more passes.',ask:'If k doubles, what grows, and what stays the same?',sk:'unroll'},
+{id:'lineage',kick:'3 · The idea',title:'An old idea that reached production in 2026',
+ idea:'Sharing weights across depth dates to 2018. In November 2026 <mark>two labs shipped looped models</mark> at very different sizes.',
+ pts:['<b>Small scale</b>: looped models trained from scratch saved parameters but lagged at equal compute.','<b>Inkling 2 Mini</b>: 26.4B total, local-sized, open weights.','<b>GLM-5.4</b>: 750B flagship; Z.ai says it reasons like 2–3T models.'],
+ hook:'Same trick, a laptop model and a 750B one.',ask:'Why might looping matter more for small models than for big ones?',sk:'timeline'},
+{id:'loop-the-middle',kick:'4 · Anatomy',title:'Loop the middle, not the ends',
+ idea:'The first and last layers mostly <mark>translate between tokens and internal ideas</mark>; the middle does the abstract work.',
+ pts:['<b>Inkling test</b>: looping the middle beat looping the last 12 layers on 27 of 28 evals.','<b>Compute-equivalent gain</b>: a no-loop model would need 1.51–1.91× the training compute to match a middle loop’s loss, but only 1.24–1.36× to match an end loop.','<b>Both models</b> loop a middle block: layers 7–18 and 27–54.'],
+ hook:'Translate once, think several times.',ask:'What would looping the first layers repeat?',sk:'middle'},
+{id:'two-designs',type:'compare',kick:'5 · Anatomy',title:'Two looped models side by side',
+ rows:[['Total params','750B','26.4B (3.4B active)'],['Stored layers','78','24'],['Looped core','27–54 (28 layers)','7–18 (12 layers)'],['Passes','2','3'],['Layer runs per token','106','48'],['Gate (how much each pass writes back; page 7)','per token, per pass','learned, on the message'],['Memory trick','shared KV + 128-token window','20 local, 4 global layers'],['How it got a loop','retrofit + continued training','loop during training, pruned experts']],
+ hook:'Same shape, different sizes and tricks.',ask:'Which differences come from size, and which from design choice?',sk:'compare'},
+{id:'blow-up',kick:'6 · Stability',title:'Naive looping makes activations blow up',
+ idea:'Feeding each pass’s output straight back in makes the hidden vector <mark>grow every pass</mark>, so the coda sees inputs it never trained on.',
+ pts:['<b>GLM-5.4</b> hit this when it turned trained middle layers into a loop.','<b>Downstream layers</b> expect a familiar scale and distribution.','<b>Fix</b>: write updates back in measured doses.'],
+ hook:'Feedback squeals when nothing turns it down.',ask:'Where else does feeding output back in cause runaway growth?',sk:'blowup'},
+{id:'gates',kick:'7 · Stability',title:'A gate decides how much each pass writes',
+ idea:'Each pass proposes h. A learned gate <mark>moves the state only a fraction β</mark> of the way toward it.',
+ pts:['<b>GLM-5.4</b>: a separate gate per token and per pass; pass 1 learns small β, pass 2 large.','<b>Hard tokens</b>: pass 1 writes more, so they get more refinement.','<b>Inkling</b>: a low-rank learned gate (rank 64) on the message from the last pass.'],
+ hook:'A dimmer, not a light switch.',ask:'What goes wrong if β is always 1? Always 0?',sk:'gate'},
+{id:'message',kick:'8 · Stability',title:'Every pass re-reads the brief and gets the last pass’s notes',
+ idea:'In Inkling 2 Mini each pass starts from <mark>the prelude’s output plus a gated message</mark> from the previous pass.',
+ pts:['<b>Attention residuals</b>: layers mix earlier blocks’ outputs instead of one running sum.','<b>The brief</b>: the prelude output feeds every pass, so context isn’t lost.','<b>The message</b>: passes 2 and 3 also read the previous pass’s core output.'],
+ hook:'Keep the brief, pass the notes.',ask:'Why re-read the original input on every pass?',sk:'relay'},
+{id:'two-routes',kick:'9 · Training',title:'Two ways to get a looped model',
+ idea:'Either <mark>retrofit a loop into a trained model</mark>, or bring the loop in during training with its gate starting shut.',
+ pts:['<b>Retrofit</b> (GLM-5.4): continued training on the GLM-5 base, checked at 1B, 4B, 30B and 750B.','<b>Closed gate first</b> (Inkling): each pass starts like a no-loop model, then the gate opens.','<b>Inkling extras</b>: 384 → 128 experts pruned, then healed on 1T distilled tokens.'],
+ hook:'Start shut, open slowly.',ask:'Why is a closed gate at the start a safe way to add a loop?',sk:'routes'},
+{id:'cost',kick:'10 · Training',title:'A little more training buys a lot of inference',
+ idea:'On Thinking Machines’ scaling ladder, skipping the loop saved <mark>7.5% of training compute</mark> but needed <mark>140% more inference compute</mark> to match.',
+ pts:['<b>Matched on</b> loss over 512k-token agent traces.','<b>GLM 30B test</b>: about 10% more training compute, same parameter count, higher scores.','<b>Trade</b>: you pay once to train, but every query pays for inference.'],
+ hook:'Pay a bit up front, save on every answer.',ask:'When would 7.5% more training not be worth it?',sk:'cost'},
+{id:'variable-passes',kick:'11 · Training',title:'Train with a range of passes and you can dial depth later',
+ idea:'A research variant trained with <mark>1 to 5 passes</mark> still worked at 10 passes, though gains flattened after 3.',
+ pts:['<b>No-CoT horizon</b>: 16 s at 1 pass, 37 s at 3, about 40 s at 5–10.','<b>Shipped model</b> runs a fixed 3 passes (41 s on the same test).','<b>Next</b>: adaptive compute, with more passes for harder tokens.'],
+ hook:'Depth becomes a dial.',ask:'How would you decide how many passes a token deserves?',sk:'varloop'},
+{id:'compute',kick:'12 · Serving',title:'Shared weights are not free compute',
+ idea:'Each extra pass adds <mark>about 1.0B effective active parameters</mark> in Inkling 2 Mini: 3.4B at 1 pass, 5.4B at 3.',
+ pts:['<b>Memory</b>: the weights are stored once.','<b>Compute and bandwidth</b>: they are read again every pass.','<b>GLM-5.4</b>: fused kernels to cut memory traffic; up to 200 tokens/s off-peak.'],
+ hook:'Store once, read k times.',ask:'On a laptop, is the bottleneck maths or moving weights?',sk:'compute'},
+{id:'kv-cache',kick:'13 · Serving',title:'Keep the attention cache from multiplying',
+ idea:'A naive loop keeps a <mark>full KV cache per pass</mark>. Both models avoid that in different ways.',
+ pts:['<b>GLM-5.4</b>: pass 2 reuses pass 1’s KV and top-2,048 attention picks, plus its own 128-token window.','<b>Inkling 2 Mini</b>: 20 of 24 layers attend locally (1,024 tokens); 4 are global.','<b>Payoff</b>: long contexts (up to 1M tokens) stay affordable.'],
+ hook:'Borrow the notebook, keep a sticky note.',ask:'Why might recent tokens need a fresh view but distant ones not?',sk:'kv'},
+{id:'efficiency',kick:'14 · Serving',title:'Loop plus 4-bit gives a capable laptop model',
+ idea:'Inkling 2 Mini was trained and runs in <mark>4-bit NVFP4</mark> (last 4 layers MXFP8), so the checkpoint is about 20 GB.',
+ pts:['<b>Stanford’s intelligence-per-joule test</b>: 0.703, versus 0.430 for the next model.','<b>Runs</b> on 32 GB Macs and a DGX Spark.','<b>Caution</b>: support for loops in local runtimes is new, so speed varies.'],
+ hook:'Small weights, deep thinking.',ask:'What changes when a capable model runs fully offline?',sk:'joule'},
+{id:'reasoning-not-recall',kick:'15 · What loops buy',title:'Loops boost reasoning, not recall',
+ idea:'Extra passes help <mark>multi-step, long-context and math</mark> tasks. Closed-book facts barely move.',
+ pts:['<b>GLM 30B test</b>: math +11.3, instruction-following +3.3.','<b>Inkling varloop</b>: GraphWalks and MRCR rise with passes; SimpleQA-style recall stays flat.','<b>Inkling’s workaround</b>: lean on search and tools for facts.'],
+ hook:'Looping deepens thinking, not memory.',ask:'Why can’t re-running layers add new facts?',sk:'know'},
+{id:'n-hop',kick:'16 · What loops buy',title:'More passes follow longer chains in the head',
+ idea:'On a silent lookup-chain test, each extra pass let the model <mark>follow roughly one more hop</mark>, up to about 5.',
+ pts:['<b>Task</b>: chase entries through fictional tables without writing anything down.','<b>1 pass</b>: about 2 hops; <b>5–10 passes</b>: about 5.','<b>10 passes</b> kept helping, though training stopped at 5.'],
+ hook:'One pass, roughly one more hop.',ask:'What limits the chain once passes stop helping?',sk:'nhop'},
+{id:'thinking-inside',kick:'17 · What loops buy',title:'More thinking inside, less written out',
+ idea:'With 5 passes, reasoning on the same solved questions was <mark>less than half as long</mark>, and still readable.',
+ pts:['<b>Fewer detours</b>: “wait / hmm” dropped from 9.7 to 3.6 per answer.','<b>Legibility held</b>: same sentence length, same share of dictionary words.','<b>GLM-5.4</b> saw the same pattern: about 10–15% shorter outputs on most tests.'],
+ hook:'Work it out in your head, write less on the board.',ask:'Is shorter visible reasoning good or bad for someone checking the work?',sk:'inside'},
+{id:'oversight',kick:'18 · Oversight',title:'Hidden steps raise a monitoring question',
+ idea:'Reasoning done inside the loop is <mark>invisible to a chain-of-thought monitor</mark>. At this scale, the tests found no clear loss of oversight.',
+ pts:['<b>Steering its own CoT</b>: Inkling models managed it ≤0.1% of the time (Qwen3.8-27B: 1.3%).','<b>Sneaky side tasks</b>: no clear trend as passes went from 1 to 5.','<b>Open door</b>: looped models are a new target for interpretability.'],
+ hook:'Shorter thoughts, still on the record.',ask:'What would worry you if a model got much better at thinking silently?',sk:'monitor'},
+{id:'open-problems',type:'traps',kick:'19 · Open problems',title:'What both labs say is unsolved',
+ items:[['Overthinking','Both models can get stuck re-checking their own work.','Cap output tokens and agent turns.'],
+  ['Fixed depth','Easy and hard tokens get the same number of passes.','Adaptive compute: more passes where needed.'],
+  ['Scaling returns','Unclear how gains grow with more passes and bigger models.','Larger looped models are coming.'],
+  ['Silent reasoning at scale','Small models stay monitorable; big ones are untested.','Interpretability work inside the loop.']],
+ hook:'Deeper is better, until it isn’t.',ask:'Which of these would you study first, and how?',sk:'overthink'},
+{id:'recap',type:'recap',title:'Recap: tap any diagram to go back'}
+];
+
+/* ---------- render ---------- */
+function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
+var stage=document.getElementById('stage'),dots=document.getElementById('dots'),secs=[];
+PAGES.forEach(function(p,i){
+  var s=el('section','page');s.id=p.id;s.hidden=true;s.setAttribute('aria-label','Page '+(i+1));
+  if(p.type==='cover'){
+    var f=el('div','fig');var sv=sketch(SK.cover);sv.setAttribute('aria-label','A prelude, core and coda; the core loops k times, which equals an unrolled stack');f.appendChild(sv);s.appendChild(f);
+    var t=el('div','txt');t.appendChild(el('p','kick','A field guide · Nov 2026'));t.appendChild(el('h1',null,'Looped transformers, explained'));
+    t.appendChild(el('p','credit','What looping is, how to make it stable, train it and serve it, and what it buys, learned from GLM-5.4 and Inkling 2 Mini. An unofficial visual companion to Z.ai’s and Thinking Machines Lab’s posts.'));
+    var b=el('button','btn pri','Start');b.addEventListener('click',function(){go(1)});t.appendChild(b);s.appendChild(t);
+  }else if(p.type==='recap'){
+    s.classList.add('recap');var t=el('div','txt');t.appendChild(el('h2',null,p.title));
+    var g=el('div','thumbs');
+    PAGES.forEach(function(q,j){if(!q.sk||q.type==='cover')return;var b=el('button','thumb');var sv=sketch(SK[q.sk]);sv.setAttribute('aria-hidden','true');b.appendChild(sv);b.appendChild(el('span',null,'<b>'+q.kick.split(' · ')[0]+'.</b> '+q.hook));b.addEventListener('click',function(){go(j)});g.appendChild(b)});
+    t.appendChild(g);s.appendChild(t);
+  }else{
+    var f=el('div','fig');var sv=sketch(SK[p.sk]);sv.setAttribute('aria-label','Diagram: '+p.title);f.appendChild(sv);s.appendChild(f);
+    var t=el('div','txt');t.appendChild(el('p','kick',p.kick));t.appendChild(el('h2',null,p.title));
+    if(p.idea)t.appendChild(el('p','idea',p.idea));
+    if(p.pts){var u=el('ul','pts');p.pts.forEach(function(x){u.appendChild(el('li',null,x))});t.appendChild(u)}
+    if(p.rows){var tb='<thead><tr><th></th><th>GLM-5.4</th><th>Inkling 2 Mini</th></tr></thead><tbody>'+p.rows.map(function(r){return '<tr><th scope="row">'+r[0]+'</th><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>'}).join('')+'</tbody>';t.appendChild(el('table','cmp',tb))}
+    if(p.items){var u=el('ul','traps');p.items.forEach(function(x){u.appendChild(el('li',null,'<b>'+x[0]+'</b> · '+x[1]+'<br><span class="way">→ '+x[2]+'</span>'))});t.appendChild(u)}
+    t.appendChild(el('div','hook',p.hook));
+    t.appendChild(el('p','ask','<b>Ask the room:</b> '+p.ask));
+    s.appendChild(t);
+  }
+  stage.appendChild(s);secs.push(s);
+  var d=el('button','dot','<i></i>');d.setAttribute('aria-label','Go to page '+(i+1));d.addEventListener('click',function(){go(i)});dots.appendChild(d);
+});
+var cur=-1,prev=document.getElementById('prev'),next=document.getElementById('next'),count=document.getElementById('count');
+function go(i,fromHash){i=Math.max(0,Math.min(PAGES.length-1,i));if(i===cur)return;cur=i;
+  secs.forEach(function(s,j){s.hidden=j!==i});
+  [].forEach.call(dots.children,function(d,j){if(j===i)d.setAttribute('aria-current','page');else d.removeAttribute('aria-current')});
+  prev.disabled=i===0;next.disabled=i===PAGES.length-1;count.textContent=(i+1)+' / '+PAGES.length;stage.scrollTop=0;
+  if(!fromHash&&location.hash.slice(1)!==PAGES[i].id){try{history.replaceState(null,'','#'+PAGES[i].id)}catch(e){location.hash=PAGES[i].id}}}
+function fromHash(){var h=location.hash.slice(1),k=PAGES.findIndex(function(p){return p.id===h});go(k<0?0:k,true)}
+prev.addEventListener('click',function(){go(cur-1)});next.addEventListener('click',function(){go(cur+1)});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')go(cur+1);else if(e.key==='ArrowLeft')go(cur-1)});
+var sx=null,sy=null;stage.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+stage.addEventListener('touchend',function(e){if(sx==null)return;var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)go(cur+(dx<0?1:-1));sx=null},{passive:true});
+window.addEventListener('hashchange',fromHash);
+window.SKETCH_PAGES=PAGES.map(function(p){return p.id});
+fromHash();
+
+/* ---------- light / dark toggle ---------- */
+(function(){
+  var root=document.documentElement,tb=document.getElementById('theme'),mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+  var MOON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.6 6.6 0 0 0 10.7 10.7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+  var SUN='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  function dark(){var t=root.getAttribute('data-theme');return t?t==='dark':!!(mq&&mq.matches)}
+  function paint(){var d=dark();tb.innerHTML=d?SUN:MOON;tb.setAttribute('aria-label',d?'Switch to light mode':'Switch to dark mode');tb.title=tb.getAttribute('aria-label')}
+  try{var s=localStorage.getItem('theme');if(s==='dark'||s==='light')root.setAttribute('data-theme',s)}catch(e){}
+  tb.addEventListener('click',function(){var t=dark()?'light':'dark';root.setAttribute('data-theme',t);try{localStorage.setItem('theme',t)}catch(e){}paint()});
+  if(mq&&mq.addEventListener)mq.addEventListener('change',paint);
+  new MutationObserver(paint).observe(root,{attributes:true,attributeFilter:['data-theme']});
+  paint();
+})();
+}
+</script>
+</body>
+</html>

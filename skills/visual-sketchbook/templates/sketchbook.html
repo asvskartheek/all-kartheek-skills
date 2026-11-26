@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loop Transformer Sketchbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+/* VOICE: friendly teacher's sketchbook
+   IDEA: a hand-drawn booklet, one idea per taped page
+   PICTURE: one original rough.js scene per idea
+   COLOUR and TYPE: paper + blue ink, orange/pink accents; Kalam + Patrick Hand
+   LAYOUT: sketch left, text right; one column under 820px */
+:root{--paper:#fbf8f0;--card:#ffffff;--ink:#22303f;--muted:#5d6876;--line:#d9d2c0;--blue:#2f6fb3;--orange:#e07b28;--green:#3f9b5a;--pink:#d64f7c;--yel:#f6d24a;--hl:#ffe36e;--tape:rgba(214,200,160,.6);--wash:.42;--note:#fff1a8;--noteink:#2a2a20}
+@media (prefers-color-scheme:dark){:root:not([data-theme='light']){--paper:#1e2925;--card:#25332e;--ink:#eef0e6;--muted:#a9b5ad;--line:#3c4c45;--blue:#7fb6ee;--orange:#f3a25c;--green:#7fd096;--pink:#f08bad;--yel:#f3d86a;--hl:#8a7a26;--tape:rgba(230,225,200,.22);--wash:.3;--note:#efe29a;--noteink:#23231a}}
+:root[data-theme='dark']{--paper:#1e2925;--card:#25332e;--ink:#eef0e6;--muted:#a9b5ad;--line:#3c4c45;--blue:#7fb6ee;--orange:#f3a25c;--green:#7fd096;--pink:#f08bad;--yel:#f3d86a;--hl:#8a7a26;--tape:rgba(230,225,200,.22);--wash:.3;--note:#efe29a;--noteink:#23231a}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:19px/1.45 'Patrick Hand',system-ui,sans-serif;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;height:100dvh;overflow:hidden}
+.wash{opacity:var(--wash);filter:url(#wc)}.mark{opacity:.55}
+svg text{font-family:Kalam,cursive;fill:var(--ink)}
+.bar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:2px dashed var(--line)}
+.bar .t{min-width:0;flex:1 1 0;font:700 20px Kalam,cursive;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.count{font:16px Kalam,cursive;color:var(--muted);white-space:nowrap}
+.btn{font:700 17px Kalam,cursive;color:var(--ink);background:var(--card);border:2px solid var(--ink);border-radius:255px 18px 225px 16px/16px 225px 18px 255px;padding:8px 16px;min-height:44px;cursor:pointer;box-shadow:3px 3px 0 var(--line)}
+.btn.icon{display:inline-grid;place-items:center;padding:0;width:44px}.btn.icon svg{width:20px;height:20px}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--line)}
+.btn:focus-visible,.thumb:focus-visible,.dot:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+.btn[disabled]{opacity:.35;cursor:default}
+.stage{overflow:auto;overscroll-behavior:contain}
+.page{max-width:1200px;margin:0 auto;padding:28px 24px 36px;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:44px;align-items:center;min-height:100%}
+.page[hidden]{display:none}
+.card{position:relative;background:var(--card);border:2.5px solid var(--ink);border-radius:255px 18px 225px 16px/16px 225px 18px 255px;padding:14px;box-shadow:7px 8px 0 var(--line);transform:rotate(-.8deg)}
+.page.alt .card{transform:rotate(.9deg)}
+.card::before,.card::after{content:'';position:absolute;width:92px;height:26px;background:var(--tape);top:-12px}
+.card::before{left:12%;transform:rotate(-5deg)}.card::after{right:12%;transform:rotate(6deg)}
+.card svg{display:block;width:100%;height:auto}
+.kick{font:700 16px Kalam,cursive;color:var(--orange);margin:0 0 4px}
+h1,h2{font-family:Kalam,cursive;font-weight:700;line-height:1.12;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,5vw,54px)}h2{font-size:clamp(26px,3.2vw,36px)}
+.ul{display:block;width:min(320px,80%);height:16px;margin:2px 0 12px}
+.idea{font-size:21px;margin:0 0 12px}
+mark{background:linear-gradient(transparent 52%,var(--hl) 52%,var(--hl) 90%,transparent 90%);color:inherit;padding:0 2px}
+.pts{list-style:none;padding:0;margin:0 0 16px}
+.pts li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;margin:5px 0;align-items:start}
+.pts li svg{width:22px;height:22px;margin-top:3px}
+.hook{position:relative;display:inline-block;background:var(--note);color:var(--noteink);font:700 19px Kalam,cursive;padding:12px 18px 10px;transform:rotate(-1.6deg);box-shadow:3px 4px 0 rgba(0,0,0,.14);margin:4px 0 16px;max-width:100%}
+.hook::before{content:'';position:absolute;left:50%;top:-11px;width:70px;height:20px;margin-left:-35px;background:var(--tape);transform:rotate(3deg)}
+.ask{border:2px dashed var(--blue);border-radius:16px 225px 16px 255px/255px 16px 225px 18px;padding:10px 14px}
+.ask b{font-family:Kalam,cursive;color:var(--blue)}
+.cover h1{margin-bottom:10px}
+.credit{color:var(--muted);margin:0 0 18px}
+.traps{display:grid;gap:10px;margin:6px 0 14px;padding:0;list-style:none}
+.traps li{border:2px solid var(--line);border-radius:16px 225px 16px 255px/255px 16px 225px 18px;padding:8px 14px;background:var(--card)}
+.traps b{font-family:Kalam,cursive;color:var(--pink)}
+.traps .way{color:var(--green)}
+.recap{grid-template-columns:minmax(0,1fr);align-items:start}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+.thumb{font:16px/1.3 'Patrick Hand',sans-serif;color:var(--ink);text-align:left;background:var(--card);border:2px solid var(--ink);border-radius:255px 18px 225px 16px/16px 225px 18px 255px;padding:8px 10px 10px;cursor:pointer}
+.thumb svg{width:100%;height:auto;display:block}
+.thumb span{display:block;margin-top:4px}
+.foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:8px 16px;border-top:2px dashed var(--line);font-size:14px;color:var(--muted)}
+.foot .src{flex:1 1 320px}
+.foot a{color:var(--blue)}
+.dots{display:flex;flex-wrap:wrap;gap:2px}
+.dot{width:24px;height:24px;border:0;background:none;padding:0;cursor:pointer;display:grid;place-items:center}
+.dot i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--ink)}
+.dot[aria-current] i{background:var(--orange);border-color:var(--orange);transform:scale(1.3)}
+@media(max-width:820px){.page{grid-template-columns:minmax(0,1fr);gap:22px;padding:22px 16px 30px;align-items:start}.idea{font-size:19px}body{font-size:18px}.dots{display:none}.foot{font-size:12px;padding:6px 16px}}
+@media(max-width:480px){.bar .btn{padding:8px 11px}.count{display:none}}
+@media(prefers-reduced-motion:no-preference){.page:not([hidden]) .card{animation:pop .35s ease-out}@keyframes pop{from{opacity:0;transform:translateY(8px) rotate(-.8deg)}}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="wc"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="9"/><feGaussianBlur stdDeviation=".7"/></filter></svg>
+<header class="bar">
+  <div class="t">The Loop Transformer, sketched</div>
+  <span class="count" id="count"></span>
+  <button class="btn icon" id="theme" aria-label="Switch to dark mode"></button>
+  <button class="btn" id="prev" aria-label="Previous page">&larr;</button>
+  <button class="btn" id="next" aria-label="Next page">&rarr;</button>
+</header>
+<main class="stage" id="stage"></main>
+<footer class="foot">
+  <span class="src">Unofficial visual companion to Z.ai's post <a href="https://z.ai/blog/glm-5.4">“GLM-5.4: Toward Generalized Coding with Our First Loop Transformer”</a> (23 Nov 2026). Read the post for the full story.</span>
+  <nav class="dots" id="dots" aria-label="Pages"></nav>
+</footer>
+<script src="https://unpkg.com/roughjs@4.6.6/bundled/rough.js"></script>
+<script>
+{
+var NS='http://www.w3.org/2000/svg';
+var INK='#000001',BLUE='#000002',ORANGE='#000003',GREEN='#000004',PINK='#000005',YEL='#000006',CARD='#000007';
+var VARS={'#000001':'--ink','#000002':'--blue','#000003':'--orange','#000004':'--green','#000005':'--pink','#000006':'--yel','#000007':'--card'};
+function kit(svg,seed){
+  var rc=window.rough?window.rough.svg(svg):null,n=0;
+  function opt(o){var r={roughness:o.rough==null?1.55:o.rough,bowing:1.5,stroke:o.c||INK,strokeWidth:o.w||2.3,seed:seed*100+(++n)};
+    if(o.fill){r.fill=o.fill;r.fillStyle=o.solid?'solid':(o.style||'hachure');r.fillWeight=o.fw||1.3;r.hachureGap=o.gap||6.5;r.hachureAngle=o.ang==null?-41:o.ang}
+    if(o.dash)r.strokeLineDash=[8,8];if(o.none)r.stroke='none';return r}
+  function plain(tag,at,o){var e=document.createElementNS(NS,tag);for(var k in at)e.setAttribute(k,at[k]);e.setAttribute('stroke',o.none?'none':(o.c||INK));e.setAttribute('stroke-width',o.w||2.3);e.setAttribute('fill',o.fill||'none');if(o.fill&&!o.solid)e.setAttribute('fill-opacity',.4);if(o.dash)e.setAttribute('stroke-dasharray','8 8');e.setAttribute('stroke-linecap','round');e.setAttribute('stroke-linejoin','round');return e}
+  function add(e){svg.appendChild(e);return e}
+  function shape(name,args,tag,at,o){
+    o=o||{};
+    if(o.wash){var w=rc?rc[name].apply(rc,args.concat([{fill:o.wash,fillStyle:'solid',stroke:'none',roughness:2.3,seed:seed*100+(++n)}])):plain(tag,at,{fill:o.wash,solid:true,none:true});w.setAttribute('class','wash');add(w)}
+    if(o.only)return null;
+    return add(rc?rc[name].apply(rc,args.concat([opt(o)])):plain(tag,at,o));
+  }
+  var A={
+    L:function(x1,y1,x2,y2,o){return shape('line',[x1,y1,x2,y2],'line',{x1:x1,y1:y1,x2:x2,y2:y2},o)},
+    R:function(x,y,w,h,o){return shape('rectangle',[x,y,w,h],'rect',{x:x,y:y,width:w,height:h},o)},
+    C:function(x,y,d,o){return shape('circle',[x,y,d],'circle',{cx:x,cy:y,r:d/2},o)},
+    E:function(x,y,w,h,o){return shape('ellipse',[x,y,w,h],'ellipse',{cx:x,cy:y,rx:w/2,ry:h/2},o)},
+    P:function(d,o){return shape('path',[d],'path',{d:d},o)},
+    CV:function(pts,o){return shape('curve',[pts],'path',{d:'M'+pts.map(function(p){return p[0]+','+p[1]}).join(' L')},o)},
+    head:function(x1,y1,x2,y2,o){var a=Math.atan2(y2-y1,x2-x1),s=(o&&o.hs)||12;A.L(x2,y2,x2-s*Math.cos(a-.45),y2-s*Math.sin(a-.45),o);A.L(x2,y2,x2-s*Math.cos(a+.45),y2-s*Math.sin(a+.45),o)},
+    AR:function(x1,y1,x2,y2,o){A.L(x1,y1,x2,y2,o);A.head(x1,y1,x2,y2,o)},
+    CAR:function(pts,o){A.CV(pts,o);var a=pts[pts.length-2],b=pts[pts.length-1];A.head(a[0],a[1],b[0],b[1],o)},
+    T:function(x,y,s,o){o=o||{};var z=o.size||19;
+      if(o.bg){var w=s.length*z*.54+14,bx=o.anchor==='start'?x-7:o.anchor==='end'?x-w+7:x-w/2,b=document.createElementNS(NS,'rect');b.setAttribute('x',bx);b.setAttribute('y',y-z);b.setAttribute('width',w);b.setAttribute('height',z*1.42);b.setAttribute('rx',8);b.style.fill='var(--card)';b.style.opacity=.92;add(b)}
+      if(o.hl){var hw=s.length*z*.5;var m=A.L(x-hw/2,y-z*.28,x+hw/2,y-z*.34,{c:YEL,w:z*.75,rough:1});if(m)m.setAttribute('class','mark')}
+      var t=document.createElementNS(NS,'text');t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('font-size',z);t.setAttribute('text-anchor',o.anchor||'middle');if(o.bold)t.setAttribute('font-weight',700);if(o.rot)t.setAttribute('transform','rotate('+o.rot+' '+x+' '+y+')');if(o.c)t.style.fill='var('+VARS[o.c]+')';t.textContent=s;return add(t)},
+    face:function(x,y,r,mood,o){o=o||{};var c={c:o.c||INK,w:2,rough:.8};A.C(x-r*.36,y-r*.12,r*.2,{fill:o.c||INK,solid:true,c:o.c||INK,rough:.5});A.C(x+r*.36,y-r*.12,r*.2,{fill:o.c||INK,solid:true,c:o.c||INK,rough:.5});
+      if(mood==='sad')A.P('M'+(x-r*.4)+','+(y+r*.5)+' Q'+x+','+(y+r*.15)+' '+(x+r*.4)+','+(y+r*.5),c);
+      else if(mood==='wow')A.C(x,y+r*.4,r*.32,c);
+      else if(mood==='flat')A.L(x-r*.35,y+r*.38,x+r*.35,y+r*.38,c);
+      else A.P('M'+(x-r*.42)+','+(y+r*.22)+' Q'+x+','+(y+r*.7)+' '+(x+r*.42)+','+(y+r*.22),c)},
+    M:function(x,y,s,o){s=s||1;o=o||{};var sh=o.shirt||BLUE,hy=y-48*s;
+      A.P('M'+(x-11*s)+','+(y-31*s)+' L'+(x+11*s)+','+(y-31*s)+' L'+(x+9*s)+','+(y-2*s)+' L'+(x-9*s)+','+(y-2*s)+' Z',{wash:sh,fill:sh,gap:4,fw:1,w:2});
+      A.C(x,hy,28*s,{wash:YEL,w:2.2});A.face(x,hy,14*s,o.mood);
+      var a=o.arms||'down';
+      if(a==='up'){A.L(x-11*s,y-28*s,x-24*s,y-50*s);A.L(x+11*s,y-28*s,x+24*s,y-50*s)}
+      else if(a==='left'){A.L(x-11*s,y-26*s,x-30*s,y-22*s);A.L(x+11*s,y-26*s,x-4*s,y-16*s)}
+      else if(a==='right'){A.L(x+11*s,y-26*s,x+30*s,y-22*s);A.L(x-11*s,y-26*s,x+4*s,y-16*s)}
+      else{A.L(x-11*s,y-28*s,x-20*s,y-8*s);A.L(x+11*s,y-28*s,x+20*s,y-8*s)}
+      A.L(x-5*s,y-2*s,x-9*s,y+20*s);A.L(x+5*s,y-2*s,x+9*s,y+20*s)},
+    drop:function(x,y,c){A.E(x,y,6,10,{fill:c||BLUE,solid:true,c:c||BLUE,rough:.6,w:1})},
+    spark:function(x,y,s,c){s=s||10;var o={c:c||ORANGE,w:2.2,rough:.8};A.L(x-s,y,x-s*.35,y,o);A.L(x+s*.35,y,x+s,y,o);A.L(x,y-s,x,y-s*.35,o);A.L(x,y+s*.35,x,y+s,o)},
+    star:function(x,y,r,c){var p='',i;for(i=0;i<10;i++){var a=-Math.PI/2+i*Math.PI/5,q=i%2?r*.45:r;p+=(i?' L':'M')+(x+Math.cos(a)*q).toFixed(1)+','+(y+Math.sin(a)*q).toFixed(1)}A.P(p+' Z',{fill:c||YEL,solid:true,w:1.8,rough:.9})},
+    cloud:function(x,y,s){s=s||1;A.P('M'+x+','+y+' a'+16*s+','+16*s+' 0 0 1 '+26*s+','+(-12*s)+' a'+22*s+','+22*s+' 0 0 1 '+42*s+','+(-2*s)+' a'+15*s+','+15*s+' 0 0 1 '+20*s+','+14*s+' Z',{wash:BLUE,w:2})},
+    sun:function(x,y,r){A.C(x,y,r*2,{wash:YEL,c:ORANGE,w:2});for(var i=0;i<8;i++){var a=i*Math.PI/4;A.L(x+Math.cos(a)*(r+6),y+Math.sin(a)*(r+6),x+Math.cos(a)*(r+16),y+Math.sin(a)*(r+16),{c:ORANGE,w:2})}},
+    ground:function(y,c,x1,x2){x1=x1==null?10:x1;x2=x2==null?630:x2;A.R(x1,y,x2-x1,22,{wash:c||GREEN,only:true});var pts=[],i;for(i=0;i<=8;i++)pts.push([x1+(x2-x1)*i/8,y+(i%2?2:-2)]);A.CV(pts,{w:2.4})},
+    bubble:function(x,y,w,h,lines,o){o=o||{};var tx=o.tail==null?x+w*.3:o.tail,ty=y+h;A.P('M'+(x+10)+','+y+' L'+(x+w-10)+','+y+' Q'+(x+w)+','+y+' '+(x+w)+','+(y+10)+' L'+(x+w)+','+(y+h-10)+' Q'+(x+w)+','+ty+' '+(x+w-10)+','+ty+' L'+(tx+16)+','+ty+' L'+(o.tx==null?tx-6:o.tx)+','+(o.ty==null?ty+20:o.ty)+' L'+(tx-4)+','+ty+' L'+(x+10)+','+ty+' Q'+x+','+ty+' '+x+','+(y+h-10)+' L'+x+','+(y+10)+' Q'+x+','+y+' '+(x+10)+','+y+' Z',{fill:CARD,solid:true,w:2,rough:1});
+      lines.forEach(function(s,i){A.T(x+w/2,y+h/2+6+(i-(lines.length-1)/2)*(o.size||17)*1.15,s,{size:o.size||17,c:o.c})})},
+    tub:function(x,y,w,h,level){A.R(x+3,y+h*(1-level),w-6,h*level-3,{wash:BLUE,fill:BLUE,none:true,gap:6});A.P('M'+x+','+y+' L'+x+','+(y+h)+' L'+(x+w)+','+(y+h)+' L'+(x+w)+','+y,{w:3.2})},
+    loop:function(cx,cy,r,labels,letter,c){
+      for(var k=0;k<3;k++){var a0=(-90+k*120+26)*Math.PI/180,a1=(-90+k*120+94)*Math.PI/180,sx=cx+r*Math.cos(a0),sy=cy+r*Math.sin(a0),ex=cx+r*Math.cos(a1),ey=cy+r*Math.sin(a1);
+        A.P('M'+sx.toFixed(1)+','+sy.toFixed(1)+' A'+r+','+r+' 0 0 1 '+ex.toFixed(1)+','+ey.toFixed(1),{c:c,w:3});
+        var ta=a1+Math.PI/2;A.head(ex-Math.cos(ta)*10,ey-Math.sin(ta)*10,ex,ey,{c:c,w:3,hs:14});
+        var la=(-90+k*120)*Math.PI/180;if(labels[k])A.T(cx+r*Math.cos(la),cy+r*Math.sin(la)+6,labels[k],{size:18})}
+      if(letter){A.C(cx,cy,r*.72,{wash:c,only:true});A.T(cx,cy+16,letter,{size:50,bold:true,c:c})}},
+    graph:function(x,y,w,h,curves,goal){
+      A.AR(x,y+h,x,y-6,{w:2.2,hs:9});A.AR(x,y+h,x+w+6,y+h,{w:2.2,hs:9});A.T(x+w,y+h+19,'time',{size:15,anchor:'end'});
+      if(goal!=null)A.L(x,y+h*goal,x+w,y+h*goal,{dash:true,w:1.8});
+      curves.forEach(function(cv){var pts=[];for(var i=0;i<=24;i++){var t=i/24,v=Math.max(0.03,Math.min(.98,cv.f(t)));pts.push([x+5+t*(w-10),y+h*v])}A.CV(pts,{c:cv.c||ORANGE,w:3.2,rough:.8})})}
+  };
+  return A;
+}
+function recolor(svg){[].forEach.call(svg.querySelectorAll('*'),function(e){['stroke','fill'].forEach(function(a){var v=e.getAttribute(a);if(VARS[v])e.style[a]='var('+VARS[v]+')'})})}
+function sketch(fn,seed,vb){var svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox',vb||'0 0 640 420');svg.setAttribute('role','img');fn(kit(svg,seed||1));recolor(svg);return svg}
+
+/* ---------- sketches ---------- */
+var SK={
+cover:function(A){
+  A.sun(570,70,24);A.cloud(40,90,1.1);A.ground(372);
+  for(var i=0;i<5;i++){var mid=i>0&&i<4;A.R(250,110+i*48,150,38,{wash:mid?ORANGE:BLUE,w:2.3})}
+  A.T(325,135,'prelude',{size:17});A.T(325,183,'loop',{size:17,bold:true});A.T(325,231,'loop',{size:17,bold:true});A.T(325,279,'loop',{size:17,bold:true});A.T(325,327,'coda',{size:17});
+  A.CAR([[405,300],[470,290],[495,230],[470,170],[408,160]],{c:PINK,w:3.4});
+  A.CAR([[245,160],[185,175],[160,235],[185,290],[245,300]],{c:PINK,w:3.4});
+  A.T(520,236,'×2',{size:40,bold:true,c:PINK});
+  A.M(95,350,1.1,{mood:'happy',arms:'up',shirt:ORANGE});
+  A.bubble(20,190,150,56,['again!'],{tail:80,size:22});
+  A.spark(540,160,12,ORANGE);A.star(130,60,12,YEL);
+},
+why:function(A){
+  A.ground(360);A.L(320,40,320,350,{dash:true,w:1.8});
+  A.T(165,50,'memory',{size:24,bold:true,c:BLUE});A.T(480,50,'reasoning',{size:24,bold:true,c:ORANGE});
+  A.R(60,80,190,270,{wash:BLUE});[150,210,270].forEach(function(y){A.L(60,y,250,y)});
+  var cols=[BLUE,ORANGE,PINK,GREEN,YEL];
+  [[80,0],[115,1],[170,2],[200,3],[80,4]].forEach(function(b,k){for(var r=0;r<4;r++){var yy=90+r*60;A.R(b[0]+r*6-(k===4?0:0),yy,22,52,{fill:cols[(k+r)%5],gap:5,w:1.6})}});
+  A.T(155,335,'more weights',{size:18,bg:true});
+  for(var i=0;i<7;i++){var a=i<3?1.05-i*.35:0,bx=350+i*38,w=16,h=72,ux=Math.sin(a),uy=-Math.cos(a),rx=Math.cos(a),ry=Math.sin(a);
+    A.P('M'+bx+',358 L'+(bx+rx*w)+','+(358+ry*w)+' L'+(bx+rx*w+ux*h)+','+(358+ry*w+uy*h)+' L'+(bx+ux*h)+','+(358+uy*h)+' Z',{wash:i<3?ORANGE:CARD,w:2})}
+  A.T(470,190,'one step',{size:17});A.T(470,212,'needs the last',{size:17});
+  A.AR(395,250,560,250,{c:ORANGE,w:2.6});
+  A.T(480,140,'more steps',{size:18,hl:true});
+},
+plain:function(A){
+  A.ground(388);
+  var lab=['layer 1','layer 2','layer 3','…','layer 77','layer 78'];
+  for(var i=0;i<6;i++){var y=318-i*52;A.R(230,y,180,40,{wash:i===3?CARD:BLUE,w:2.2});A.T(320,y+27,lab[i],{size:18});
+    A.P('M'+440+','+(y+20)+' l8,10 l16,-20',{c:GREEN,w:3,rough:.7})}
+  A.AR(200,372,200,40,{c:ORANGE,w:3});
+  A.R(150,362,36,26,{wash:YEL,w:2});A.T(168,355,'token',{size:15});
+  A.T(540,180,'one visit',{size:20,bold:true,c:GREEN});A.T(540,204,'each',{size:20,bold:true,c:GREEN});
+  A.M(90,365,1,{mood:'happy',arms:'right'});
+},
+loop:function(A){
+  A.R(220,150,200,130,{wash:ORANGE,w:2.6});A.T(320,205,'28 shared',{size:22,bold:true});A.T(320,232,'layers',{size:22,bold:true});
+  A.AR(320,390,320,290,{w:2.8});A.T(345,370,'in',{size:18,anchor:'start'});
+  A.AR(320,145,320,50,{w:2.8});A.T(345,75,'out',{size:18,anchor:'start'});
+  A.CAR([[425,165],[505,175],[530,215],[505,262],[428,272]],{c:PINK,w:3.4});
+  A.T(560,224,'pass 2',{size:20,bold:true,c:PINK,anchor:'start',bg:true});
+  A.T(212,320,'pass 1',{size:20,bold:true,c:BLUE,anchor:'end'});
+  A.M(100,330,1.05,{mood:'wow',arms:'right'});
+  A.bubble(30,110,160,58,['same weights!'],{tail:95,size:19});
+  A.L(20,353,180,353,{w:2});
+},
+retro:function(A){
+  A.ground(370);A.sun(590,60,20);
+  A.L(120,290,120,370,{w:3});A.R(45,235,150,55,{fill:CARD,solid:true});A.T(120,270,'from scratch',{size:19});
+  A.L(40,225,200,305,{c:PINK,w:4});A.L(200,225,40,305,{c:PINK,w:4});
+  A.T(120,215,'still lags',{size:16,c:PINK});
+  A.R(300,210,200,160,{wash:BLUE,w:2.6});A.P('M285,212 L400,120 L515,212 Z',{wash:ORANGE,w:2.6});
+  A.R(330,240,46,40,{fill:CARD,solid:true});A.R(420,290,44,80,{wash:ORANGE});
+  A.T(400,342,'GLM-5',{size:18,bold:true,bg:true});
+  A.CAR([[505,250],[565,235],[580,180],[550,140],[490,150]],{c:GREEN,w:3.4});
+  A.T(585,120,'+ loop',{size:20,bold:true,c:GREEN,anchor:'end'});
+  A.M(590,350,.9,{mood:'happy',arms:'up',shirt:GREEN});
+},
+route:function(A){
+  A.R(10,20,620,390,{wash:GREEN,only:true});
+  A.C(320,205,230,{w:2.4});A.C(320,205,130,{wash:GREEN,w:2.4});
+  A.loop(320,205,92,['','',''],null,ORANGE);
+  A.T(320,198,'loop',{size:22,bold:true});A.T(320,222,'L27–54',{size:16});
+  A.P('M15,330 L210,250',{w:2.4});A.P('M15,385 L225,290',{w:2.4});
+  A.P('M625,330 L430,250',{w:2.4});A.P('M625,385 L415,290',{w:2.4});
+  A.AR(60,345,170,298,{c:BLUE,w:2.6});A.AR(470,298,580,345,{c:BLUE,w:2.6});
+  A.T(110,395,'prelude · 26 layers',{size:17,bg:true});A.T(530,395,'coda · 24 layers',{size:17,bg:true});
+  A.T(320,70,'28 layers · 2 laps',{size:18,bg:true});
+  A.T(110,60,'78 stored',{size:19,bold:true,bg:true});A.T(530,60,'106 run',{size:19,bold:true,c:ORANGE,bg:true});
+  A.R(420,140,36,20,{fill:PINK,solid:true,w:1.8});A.C(428,162,9,{fill:INK,solid:true,w:1});A.C(448,162,9,{fill:INK,solid:true,w:1});
+},
+blow:function(A){
+  A.T(60,102,'x₀',{size:18,anchor:'start'});A.AR(60,118,190,118,{c:BLUE,w:4});
+  A.T(60,177,'after pass 1',{size:18,anchor:'start'});A.AR(60,195,310,195,{c:ORANGE,w:5.5});
+  A.T(60,258,'after pass 2',{size:18,anchor:'start'});A.AR(60,280,470,280,{c:PINK,w:7.5});
+  A.spark(490,250,14,PINK);A.spark(345,175,10,ORANGE);
+  A.T(60,330,'size of the vector keeps growing',{size:17,anchor:'start',c:INK});
+  A.M(560,370,1,{mood:'sad',arms:'up'});A.L(480,392,630,392,{w:2});
+  A.bubble(460,50,170,70,['coda layers:','“too big!”'],{tail:540,size:17});
+},
+gate:function(A){
+  A.ground(372);
+  A.R(40,180,120,150,{wash:BLUE,w:2.6});A.T(100,250,'old',{size:20,bold:true});A.T(100,274,'x₀',{size:20});
+  A.R(480,180,120,150,{wash:ORANGE,w:2.6});A.T(540,250,'new',{size:20,bold:true});A.T(540,274,'h',{size:20});
+  A.P('M260,260 L270,370 L370,370 L380,260',{w:2.8});A.R(268,300,104,66,{wash:PINK,only:true});
+  A.CAR([[160,200],[220,170],[275,245]],{c:BLUE,w:2.8});A.CAR([[480,200],[420,170],[365,245]],{c:ORANGE,w:2.8});
+  A.L(200,80,440,80,{w:3});A.T(200,110,'0',{size:18});A.T(440,110,'1',{size:18});
+  A.C(290,80,26,{fill:YEL,solid:true,w:2.4});A.T(290,55,'β',{size:26,bold:true});
+  A.T(320,402,'x₁ = x₀ + β·(h − x₀)',{size:20,bold:true,bg:true});
+},
+draft:function(A){
+  function cat(cx,o){A.C(cx,200,130,o);A.P('M'+(cx-55)+',165 L'+(cx-45)+',105 L'+(cx-15)+',140',o);A.P('M'+(cx+55)+',165 L'+(cx+45)+',105 L'+(cx+15)+',140',o);
+    A.L(cx-70,215,cx-30,210,o);A.L(cx+70,215,cx+30,210,o);A.C(cx,215,10,o)}
+  A.R(25,60,280,270,{w:2.2});A.R(335,60,280,270,{w:2.2});
+  cat(165,{c:BLUE,w:1.2,dash:true,rough:2});
+  A.C(475,200,130,{wash:YEL,only:true});cat(475,{w:3.6});
+  A.face(475,195,40,'happy');
+  A.T(165,315,'pass 1',{size:20,bold:true,c:BLUE});A.T(475,315,'pass 2',{size:20,bold:true,c:ORANGE});
+  A.R(65,360,200,20,{w:2});A.R(67,362,40,16,{fill:BLUE,solid:true,none:true});A.T(165,407,'small β',{size:17});
+  A.R(375,360,200,20,{w:2});A.R(377,362,180,16,{fill:ORANGE,solid:true,none:true});A.T(475,407,'big β',{size:17});
+},
+cabinet:function(A){
+  A.ground(360);
+  function cab(x,c,t){A.R(x,80,140,280,{wash:c,w:2.6});for(var i=1;i<4;i++)A.L(x,80+i*70,x+140,80+i*70,{w:2});for(var j=0;j<4;j++)A.R(x+52,105+j*70,36,10,{fill:INK,solid:true,w:1.2});A.T(x+70,68,t,{size:19,bold:true})}
+  cab(90,BLUE,'pass 1 KV');cab(260,ORANGE,'pass 2 KV');
+  A.T(240,395,'one full copy per pass',{size:18,hl:true});
+  A.M(520,340,1.1,{mood:'sad',arms:'up'});A.drop(555,265,BLUE);A.drop(490,275,BLUE);
+  A.bubble(440,100,180,62,['1M tokens… ×2?'],{tail:520,size:18});
+},
+hybrid:function(A){
+  A.R(60,100,320,220,{wash:BLUE,w:2.6});
+  for(var i=0;i<8;i++)A.C(90+i*40,100,16,{w:1.8});
+  for(var r=0;r<6;r++)A.L(85,145+r*28,355,145+r*28,{c:BLUE,w:1.4});
+  A.T(220,90-14,'pass-1 notes · shared',{size:18,bold:true});
+  A.R(420,140,170,140,{wash:YEL,fill:YEL,solid:false,gap:9,w:2.4});
+  A.T(505,195,'pass 2',{size:20,bold:true,bg:true});A.T(505,228,'last 128',{size:18,bg:true});A.T(505,252,'tokens',{size:18,bg:true});
+  A.CAR([[220,325],[260,365],[300,372]],{c:BLUE,w:2.8});A.CAR([[505,285],[440,360],[380,372]],{c:ORANGE,w:2.8});
+  A.T(340,402,'one attention reads both',{size:19,bold:true,bg:true});
+},
+index:function(A){
+  A.ground(372);
+  A.P('M120,130 L310,145 L310,355 L120,340 Z',{wash:CARD,w:2.4});A.P('M310,145 L500,130 L500,340 L310,355 Z',{wash:CARD,w:2.4});
+  for(var r=0;r<6;r++){A.L(140,180+r*26,290,190+r*26,{w:1.2});A.L(330,190+r*26,480,180+r*26,{w:1.2})}
+  [[150,PINK],[210,GREEN],[370,ORANGE],[440,BLUE]].forEach(function(b){A.R(b[0],95,18,45,{fill:b[1],solid:true,w:1.8})});
+  A.T(310,78,'top 2,048 picks',{size:20,bold:true,hl:true});
+  A.M(60,350,.9,{mood:'happy',shirt:BLUE,arms:'right'});A.T(60,412,'pass 1',{size:16});
+  A.M(570,350,.9,{mood:'happy',shirt:ORANGE,arms:'left'});A.T(570,412,'pass 2',{size:16});
+  A.bubble(510,180,120,56,['same tabs'],{tail:560,size:18});
+},
+bridge:function(A){
+  A.sun(580,60,20);A.cloud(60,70,1);
+  A.R(180,322,280,80,{wash:BLUE,only:true});
+  for(var i=0;i<4;i++)A.P('M'+(200+i*65)+',360 q12,-8 24,0 q12,8 24,0',{c:BLUE,w:1.8});
+  A.ground(300,GREEN,10,180);A.ground(300,GREEN,460,630);
+  A.L(180,300,460,300,{w:3.2});A.P('M190,400 Q320,250 450,400',{w:2.6});
+  A.C(200,288,22,{w:2});A.C(236,288,22,{w:2});A.L(200,288,218,268,{w:2});A.L(218,268,236,288,{w:2});A.T(218,250,'1B',{size:18,bold:true});
+  A.R(255,262,60,28,{wash:GREEN,w:2.2});A.C(268,292,14,{fill:INK,solid:true,w:1});A.C(302,292,14,{fill:INK,solid:true,w:1});A.T(285,250,'4B',{size:18,bold:true});
+  A.R(330,245,80,45,{wash:BLUE,w:2.2});A.C(345,292,16,{fill:INK,solid:true,w:1});A.C(395,292,16,{fill:INK,solid:true,w:1});A.T(370,233,'30B',{size:18,bold:true});
+  A.R(430,220,130,70,{wash:ORANGE,w:2.4});A.C(450,292,18,{fill:INK,solid:true,w:1});A.C(540,292,18,{fill:INK,solid:true,w:1});A.T(495,205,'750B',{size:20,bold:true,c:ORANGE});
+  A.T(495,262,'GLM-5.4',{size:16,bg:true});
+},
+bars:function(A){
+  var d=[['AIME25',19.17,30.42,11.3],['GPQA-D',47.58,56.26,8.7],['AA-LCR',40.33,47.67,7.3],['MMLU-Pro',71.65,75.05,3.4],['IFBench',50.2,53.47,3.3]];
+  A.L(40,340,630,340,{w:2.4});
+  d.forEach(function(r,i){var gx=58+i*116,h1=r[1]*3.2,h2=r[2]*3.2;
+    A.R(gx,340-h1,38,h1,{fill:INK,gap:9,fw:1,w:2});A.R(gx+44,340-h2,38,h2,{wash:ORANGE,fill:ORANGE,gap:5,w:2.2});
+    A.T(gx+19,334-h1,r[1].toFixed(1),{size:14});A.T(gx+63,334-h2,r[2].toFixed(1),{size:14,bold:true});
+    A.T(gx+41,310-h2,'+'+r[3],{size:19,bold:true,c:GREEN});
+    A.T(gx+41,366,r[0],{size:16})});
+  A.R(50,24,18,18,{fill:INK,gap:6,w:1.6});A.T(76,40,'same 30B, no loop',{size:16,anchor:'start'});
+  A.R(250,24,18,18,{wash:ORANGE,fill:ORANGE,gap:4,w:1.6});A.T(276,40,'same 30B + loop',{size:16,anchor:'start'});
+  A.T(320,404,'score, thinking mode on',{size:15});
+},
+inside:function(A){
+  A.ground(372);
+  A.M(140,352,1,{mood:'flat',arms:'right'});
+  A.bubble(20,40,270,190,[],{tail:140});
+  for(var i=0;i<7;i++){var pts=[],n=i===6?4:10;for(var k=0;k<=n;k++)pts.push([45+k*22,75+i*20+(k%2?-3:3)]);A.CV(pts,{c:BLUE,w:1.6,rough:.6})}
+  A.T(140,262,'thinks out loud',{size:17});
+  A.M(470,352,1,{mood:'happy',arms:'down'});
+  A.C(420,140,36,{w:2});A.C(445,240,12,{w:1.6});A.C(455,265,8,{w:1.6});
+  A.E(440,100,190,130,{wash:CARD,w:2.2});A.loop(440,100,42,['','',''],null,ORANGE);
+  A.bubble(510,210,110,50,['short'],{tail:520,tx:495,ty:282,size:18});
+  A.T(440,30,'deeper inside',{size:18,bold:true,c:ORANGE});
+  A.T(470,402,'≈ 10–15% fewer tokens',{size:17,hl:true});
+},
+speed:function(A){
+  var cx=320,cy=320,r=220,mx=220;
+  function pt(v,rr){var a=Math.PI*(1-v/mx);return [cx+Math.cos(a)*rr,cy-Math.sin(a)*rr]}
+  A.P('M'+(cx-r)+','+cy+' A'+r+','+r+' 0 0 1 '+(cx+r)+','+cy,{w:3.2});
+  var p70=pt(70,r-18),p80=pt(80,r-18);A.P('M'+p70[0].toFixed(1)+','+p70[1].toFixed(1)+' A'+(r-18)+','+(r-18)+' 0 0 1 '+p80[0].toFixed(1)+','+p80[1].toFixed(1),{c:ORANGE,w:16,rough:.6});
+  [0,50,100,150,200].forEach(function(v){var a=pt(v,r),b=pt(v,r-24),t=pt(v,r-48);A.L(a[0],a[1],b[0],b[1],{w:2.4});A.T(t[0],t[1]+6,''+v,{size:17})});
+  var n=pt(200,r-70);A.L(cx,cy,n[0],n[1],{c:PINK,w:5});A.C(cx,cy,26,{fill:INK,solid:true});
+  var lp=pt(75,r+20);A.T(lp[0]-10,lp[1],'peak 70–80',{size:18,bold:true,c:ORANGE,anchor:'end'});
+  A.T(610,196,'off-peak 200',{size:18,bold:true,c:PINK,anchor:'end'});
+  A.T(cx,cy+50,'tokens per second',{size:19});
+  A.L(60,cy+10,580,cy+10,{w:1.6});
+},
+marathon:function(A){
+  A.E(320,215,560,300,{wash:ORANGE,w:2.6});A.E(320,215,380,150,{wash:GREEN,w:2.4});
+  A.E(320,215,470,225,{dash:true,w:1.6});
+  A.M(320,345,1,{mood:'flat',arms:'left',shirt:PINK});A.drop(350,280,BLUE);A.drop(288,285,BLUE);
+  A.T(320,205,'lap',{size:20});A.T(320,235,'9,999',{size:26,bold:true});
+  A.L(560,215,560,120,{w:2.6});A.P('M560,120 L610,135 L560,150 Z',{fill:GREEN,solid:true,w:2});A.T(585,105,'answer',{size:16});
+  A.bubble(70,20,190,56,['one more check…'],{tail:180,tx:250,ty:110,size:17});
+}
+};
+
+/* ---------- pages ---------- */
+var PAGES=[
+{id:'cover',type:'cover',sk:'cover'},
+{id:'why-loop',kick:'1 · Why loop at all',title:'Some jobs need a bigger memory; others need longer thinking',
+ idea:'Facts live in <mark>weights</mark>. Long chains of reasoning need <mark>more compute per token</mark>.',
+ pts:['<b>Memory-heavy</b> tasks gain from more parameters.','<b>Reasoning-heavy</b> tasks (big codebases, security, 3D, robot control) are long chains of dependent steps.','<b>A loop</b> adds steps without adding weights.'],
+ hook:'A bigger library doesn’t make a deeper thinker.',ask:'Which of your own tasks is a lookup, and which is a long chain?',sk:'why'},
+{id:'plain',kick:'2 · The usual transformer',title:'Normally every layer gets exactly one turn',
+ idea:'A token’s vector climbs the stack and <mark>each layer touches it once</mark>.',
+ pts:['<b>Depth</b> = how many times the vector gets refined.','<b>GLM-5</b> stacks 78 layers.','<b>More depth</b> usually means more weights to store and serve.'],
+ hook:'One stop per station.',ask:'What would you have to pay for to make a normal model deeper?',sk:'plain'},
+{id:'the-loop',kick:'3 · The loop',title:'A loop runs the same layers again on their own output',
+ idea:'Pass 2 takes pass 1’s result and <mark>refines it with the same weights</mark>.',
+ pts:['<b>Weight-shared</b>: the looped block is stored once.','<b>Two passes</b> for every token in GLM-5.4.','<b>Z.ai’s claim</b>: the 750B model performs like 2–3T-parameter models.'],
+ hook:'Reread your draft, don’t buy a new brain.',ask:'When do you reread something instead of reading more?',sk:'loop'},
+{id:'retrofit',kick:'4 · Old idea, new route',title:'Convert a trained model instead of starting from zero',
+ idea:'Looped models trained from scratch still trail normal ones on the same budget, so Z.ai <mark>added the loop to the pretrained GLM-5 base</mark>.',
+ pts:['<b>2018</b>: the Universal Transformer first shared weights across depth.','<b>From scratch</b>: saves parameters, but lags at equal pre-training compute.','<b>Continued training</b> adds the loop for a small extra cost.'],
+ hook:'Renovate the house you already own.',ask:'Why might a model that already knows language learn to loop cheaply?',sk:'retro'},
+{id:'route',kick:'5 · Where the loop sits',title:'Only the middle of the stack goes round twice',
+ idea:'Layers 1–26 run once, <mark>layers 27–54 run twice</mark>, layers 55–78 run once.',
+ pts:['<b>Prelude</b> (26 layers): reads the input.','<b>Loop</b> (28 layers × 2): does the extra thinking.','<b>Coda</b> (24 layers): turns the result into the next token.'],
+ hook:'On-ramp, two laps, off-ramp.',ask:'Why loop the middle rather than the first or last layers?',sk:'route'},
+{id:'blow-up',kick:'6 · First problem',title:'Pouring pass 2 straight in makes the numbers blow up',
+ idea:'Overwriting the hidden state each pass made <mark>activation sizes grow</mark>, and the coda got inputs at a scale it had never seen.',
+ pts:['<b>Norm growth</b>: vectors get bigger every pass.','<b>Mismatch</b>: later layers expect a familiar scale.','<b>Need</b>: a way to add updates in measured doses.'],
+ hook:'Feedback squeals when nothing turns it down.',ask:'Where else does feeding output back in cause runaway growth?',sk:'blow'},
+{id:'gates',kick:'7 · The fix: gates',title:'A gate decides how much of each pass to keep',
+ idea:'Each pass proposes h; a per-token gate <mark>blends it in by a fraction β</mark>.',
+ pts:['<b>β near 0</b>: keep the old state.','<b>β near 1</b>: take the new proposal.','<b>Separate gates</b> for each pass and each token.'],
+ hook:'A dimmer, not a light switch.',ask:'What would go wrong if β were always 1?',sk:'gate'},
+{id:'pencil-pen',kick:'8 · What the gates learned',title:'Pass 1 sketches lightly; pass 2 inks it in',
+ idea:'After training, <mark>pass 1 writes small</mark> to gather context and <mark>pass 2 writes big</mark> to refine.',
+ pts:['<b>Pass 1</b>: small β, builds the big picture, keeps scale steady.','<b>Pass 2</b>: gates wide open, full updates.','<b>Hard tokens</b>: pass 1 writes more boldly, so they get more refinement.'],
+ hook:'Pencil first, then pen.',ask:'How do you treat a first draft differently from a final one?',sk:'draft'},
+{id:'kv-cost',kick:'9 · Second problem: memory',title:'Done naively, every pass needs its own full memory',
+ idea:'Attention keeps a <mark>KV cache</mark> of every earlier token. A full copy per pass multiplies memory by the loop count.',
+ pts:['<b>KV cache</b>: each layer’s notes on earlier tokens.','<b>Naive loop</b>: one full cache per pass.','<b>At 1M tokens</b> of context, that extra copy is expensive to serve.'],
+ hook:'Two passes shouldn’t mean two filing cabinets.',ask:'What grows with context length, and what doesn’t?',sk:'cabinet'},
+{id:'hybrid-kv',kick:'10 · Hybrid KV cache',title:'Pass 2 borrows pass 1’s notes and keeps only a small window of its own',
+ idea:'Pass 2 reads pass 1’s selected KV plus its own <mark>128-token sliding window</mark>, in one attention.',
+ pts:['<b>Shared</b>: pass 1’s sparse KV is reused.','<b>Own window</b>: fresh pass-2 KV only for recent tokens.','<b>Cost</b>: the extra pass adds one window, not a second full cache.'],
+ hook:'Borrow the notebook, keep a sticky note.',ask:'Why might recent tokens need the updated view but distant ones not?',sk:'hybrid'},
+{id:'index-reuse',kick:'11 · Index reuse',title:'Pass 2 reuses pass 1’s choice of what to look at',
+ idea:'GLM-5’s sparse attention picks the <mark>top 2,048 earlier tokens</mark> to attend to; pass 2 reuses that pick.',
+ pts:['<b>Indexer</b>: scores earlier tokens, keeps the top k.','<b>Pass 2</b> has no indexer: zero extra indexing work.','<b>In Z.ai’s tests</b>: about as good as picking again.'],
+ hook:'Same bookmarks, second read.',ask:'When is it safe to reuse a decision instead of making it again?',sk:'index'},
+{id:'scale-ladder',kick:'12 · Scaling correctness',title:'Test the change at every size before the flagship',
+ idea:'The loop was checked on <mark>1B, 4B, 30B and 750B</mark> base models before GLM-5.4 relied on it.',
+ pts:['<b>Rule</b>: a trick only counts if it survives scale.','<b>Ladder</b>: 1B → 4B → 30B → 750B.','<b>30B twin</b>: same design as the 750B base, used for the fair test.'],
+ hook:'Test the bridge with bikes before trucks.',ask:'What have you seen work small and fail big?',sk:'bridge'},
+{id:'fair-test',kick:'13 · The fair test',title:'Same parameters, ~10% more training compute, every score up',
+ idea:'On the 30B test model (not GLM-5.4 itself), the loop <mark>lifted every benchmark</mark>, and math gained most.',
+ pts:['<b>AIME25</b> (math): +11.3 points.','<b>GPQA-Diamond</b> (science): +8.7; <b>AA-LCR</b> (long context): +7.3.','<b>MMLU-Pro</b> +3.4, <b>IFBench</b> +3.3: smaller gains on shorter chains.'],
+ hook:'The longer the chain, the bigger the gain.',ask:'Why would math gain more than following instructions?',sk:'bars'},
+{id:'think-inside',kick:'14 · Thinking moves inside',title:'Deeper inside, shorter out loud',
+ idea:'With the loop, answers used <mark>about 10–15% fewer tokens</mark> on most tests: some reasoning moved into depth.',
+ pts:['<b>MMLU-Pro</b> −14.9%, <b>IFBench</b> −13.0%, <b>GPQA</b> −11.7%.','<b>AA-LCR</b> −9.7%.','<b>AIME25</b> barely changed: −2%.'],
+ hook:'Work it out in your head, write less on the board.',ask:'Is shorter visible reasoning good or bad for people checking the work?',sk:'inside'},
+{id:'speed',kick:'15 · Still fast',title:'Two passes, served at full speed',
+ idea:'GLM-5.4 serves <mark>up to 200 tokens/s</mark> off-peak and 70–80 at peak load.',
+ pts:['<b>Fused kernels</b>: fewer memory reads and writes per pass.','<b>Cache and index reuse</b>: less memory and lookup work.','<b>Co-design</b>: model and serving stack built together.'],
+ hook:'Two laps, no pit stop.',ask:'For a loop, which costs more: the maths or moving data around?',sk:'speed'},
+{id:'open-problems',type:'traps',kick:'16 · Limits and what’s next',title:'Open problems Z.ai names',
+ items:[['Marathon thinking','It can reflect for too long.','The extra checking still raises accuracy.'],
+  ['Fixed two passes','Easy and hard tokens get the same depth.','Next: adaptive compute, more passes for harder tokens.'],
+  ['Unknown returns','How gains change with more loops and bigger models.','Next: a much larger model built on what they learned.']],
+ hook:'Thinking longer helps, until it doesn’t.',ask:'How would you decide when a token has thought enough?',sk:'marathon'},
+{id:'recap',type:'recap',title:'Recap: tap a sketch to revisit it'}
+];
+
+/* ---------- render ---------- */
+function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
+function deco(fn,seed,vb,cls){var s=sketch(fn,seed,vb);s.setAttribute('aria-hidden','true');s.removeAttribute('role');if(cls)s.setAttribute('class',cls);return s}
+function underline(seed){return deco(function(A){A.L(4,8,296,6,{c:YEL,w:9,rough:1.2})},seed,'0 0 300 14','ul')}
+function bullet(seed){return deco(function(A){A.star(12,12,10,ORANGE)},seed,'0 0 24 24')}
+var stage=document.getElementById('stage'),dots=document.getElementById('dots'),secs=[];
+PAGES.forEach(function(p,i){
+  var s=el('section','page'+(i%2?' alt':''));s.id=p.id;s.hidden=true;s.setAttribute('aria-label','Page '+(i+1));
+  if(p.type==='cover'){
+    var c=el('div','card');var sv=sketch(SK.cover,1);sv.setAttribute('aria-label','A stack of layers where the middle three are looped twice, and a person cheering');c.appendChild(sv);s.appendChild(c);
+    var t=el('div','txt');t.appendChild(el('p','kick','GLM-5.4 · Z.ai'));t.appendChild(el('h1',null,'The Loop Transformer, sketched'));t.appendChild(underline(99));
+    t.appendChild(el('p','credit','An unofficial visual companion to Z.ai’s post “GLM-5.4: Toward Generalized Coding with Our First Loop Transformer”. Read the post for the full story.'));
+    var b=el('button','btn','Start →');b.addEventListener('click',function(){go(1)});t.appendChild(b);s.appendChild(t);
+  }else if(p.type==='recap'){
+    s.classList.add('recap');var t=el('div','txt');t.appendChild(el('h2',null,p.title));t.appendChild(underline(98));
+    var g=el('div','thumbs');
+    PAGES.forEach(function(q,j){if(!q.sk||q.type==='cover')return;var b=el('button','thumb');var sv=sketch(SK[q.sk],j+1);sv.setAttribute('aria-hidden','true');b.appendChild(sv);b.appendChild(el('span',null,'<b>'+q.kick.split(' · ')[0]+'.</b> '+q.hook));b.addEventListener('click',function(){go(j)});g.appendChild(b)});
+    t.appendChild(g);s.appendChild(t);
+  }else{
+    var c=el('div','card');var sv=sketch(SK[p.sk],i+1);sv.setAttribute('aria-label','Sketch: '+p.hook);c.appendChild(sv);s.appendChild(c);
+    var t=el('div','txt');t.appendChild(el('p','kick',p.kick));t.appendChild(el('h2',null,p.title));t.appendChild(underline(i+40));
+    if(p.idea)t.appendChild(el('p','idea',p.idea));
+    if(p.pts){var u=el('ul','pts');p.pts.forEach(function(x,k){var li=el('li');li.appendChild(bullet(i*10+k));li.appendChild(el('span',null,x));u.appendChild(li)});t.appendChild(u)}
+    if(p.items){var u=el('ul','traps');p.items.forEach(function(x){u.appendChild(el('li',null,'<b>'+x[0]+'</b> · '+x[1]+'<br><span class="way">→ '+x[2]+'</span>'))});t.appendChild(u)}
+    t.appendChild(el('div','hook',p.hook));
+    t.appendChild(el('p','ask','<b>Ask the room:</b> '+p.ask));
+    s.appendChild(t);
+  }
+  stage.appendChild(s);secs.push(s);
+  var d=el('button','dot','<i></i>');d.setAttribute('aria-label','Go to page '+(i+1));d.addEventListener('click',function(){go(i)});dots.appendChild(d);
+});
+var cur=-1,prev=document.getElementById('prev'),next=document.getElementById('next'),count=document.getElementById('count');
+function go(i,fromHash){i=Math.max(0,Math.min(PAGES.length-1,i));if(i===cur)return;cur=i;
+  secs.forEach(function(s,j){s.hidden=j!==i});
+  [].forEach.call(dots.children,function(d,j){if(j===i)d.setAttribute('aria-current','page');else d.removeAttribute('aria-current')});
+  prev.disabled=i===0;next.disabled=i===PAGES.length-1;count.textContent=(i+1)+' / '+PAGES.length;stage.scrollTop=0;
+  if(!fromHash&&location.hash.slice(1)!==PAGES[i].id){try{history.replaceState(null,'','#'+PAGES[i].id)}catch(e){location.hash=PAGES[i].id}}}
+function fromHash(){var h=location.hash.slice(1),k=PAGES.findIndex(function(p){return p.id===h});go(k<0?0:k,true)}
+prev.addEventListener('click',function(){go(cur-1)});next.addEventListener('click',function(){go(cur+1)});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')go(cur+1);else if(e.key==='ArrowLeft')go(cur-1)});
+var sx=null,sy=null;stage.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+stage.addEventListener('touchend',function(e){if(sx==null)return;var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)go(cur+(dx<0?1:-1));sx=null},{passive:true});
+window.addEventListener('hashchange',fromHash);
+window.SKETCH_PAGES=PAGES.map(function(p){return p.id});
+fromHash();
+
+/* ---------- light / dark toggle ---------- */
+(function(){
+  var root=document.documentElement,tb=document.getElementById('theme'),mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+  var MOON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.6 6.6 0 0 0 10.7 10.7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+  var SUN='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  function dark(){var t=root.getAttribute('data-theme');return t?t==='dark':!!(mq&&mq.matches)}
+  function paint(){var d=dark();tb.innerHTML=d?SUN:MOON;tb.setAttribute('aria-label',d?'Switch to light mode':'Switch to dark mode');tb.title=tb.getAttribute('aria-label')}
+  try{var s=localStorage.getItem('theme');if(s==='dark'||s==='light')root.setAttribute('data-theme',s)}catch(e){}
+  tb.addEventListener('click',function(){var t=dark()?'light':'dark';root.setAttribute('data-theme',t);try{localStorage.setItem('theme',t)}catch(e){}paint()});
+  if(mq&&mq.addEventListener)mq.addEventListener('change',paint);
+  new MutationObserver(paint).observe(root,{attributes:true,attributeFilter:['data-theme']});
+  paint();
+})();
+}
+</script>
+</body>
+</html>
